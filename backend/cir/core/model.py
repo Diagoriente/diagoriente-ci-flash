@@ -4,7 +4,7 @@ import numpy.typing as npt
 
 from cir.util import rg
 from dataclasses import dataclass
-from typing import overload, Tuple, Union
+from typing import overload, Tuple, Union, Iterator
 
 
 @dataclass(frozen = True)
@@ -46,6 +46,13 @@ class CiSelection:
             raise TypeError(f"list indices must be integers or slices, not " +
                     f"{type(key)}")
 
+    def __iter__(self) -> Iterator[CiId]:
+        return iter(self.ids)
+
+    def contains(self, ci_id: CiId) -> bool:
+        return ci_id in self.ids
+
+
 
 @dataclass(frozen = True)
 class CiSet:
@@ -76,6 +83,9 @@ class CiSet:
     def mean_axes(self) -> npt.NDArray[np.float64]:
         mean: npt.NDArray[np.float64] = self.axes.mean(axis = 0)
         return mean
+
+    def contains(self, ci_id: CiId) -> bool:
+        return self.ids.contains(ci_id)
 
 
 @dataclass(frozen = True)
@@ -124,10 +134,12 @@ def ci_ouverture(ci_set: CiSet, preferences: Model) -> CiSelection:
     return CiSelection.from_ints(ids_list)
 
 
-def ci_recommend(n: int, ci_set: CiSet, preferences: Model) \
+def ci_recommend(n: int, ci_selected: CiSet,  ci_set: CiSet, preferences: Model) \
         -> Tuple[CiSelection, CiSelection, CiSelection]:
-    proches = ci_proches(ci_set, preferences)
+    proches = CiSelection(ids = [ci for ci in ci_proches(ci_set, preferences)
+        if not ci_selected.contains(ci)])
     distants = CiSelection(ids = list(reversed(proches.ids)))
-    ouv = ci_ouverture(ci_set, preferences)
+    ouv = CiSelection(ids = [ci for ci in ci_ouverture(ci_set, preferences)
+        if not ci_selected.contains(ci)])
     return (proches[:n], ouv[:n], distants[:n])
 

@@ -2,11 +2,20 @@ from cir import constants
 from cir.core import model
 from cir.interface.csv import ci_set_from_csv
 from fastapi import FastAPI, HTTPException
-from typing import Optional, Any, Tuple
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Optional, Any, Tuple, Dict
 
 app = FastAPI()
 
 ci_set = ci_set_from_csv(constants.COEFDATAFILE)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[constants.FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def pass_ci_id_or_raise(i: int, msg: str) -> None:
     if i < 0 or i >= ci_set.size():
@@ -23,16 +32,10 @@ async def ci_random(n: int) -> list[int]:
 
 
 @app.post("/ci_recommend")
-async def ci_recommend(n: int, selected_cis: list[int]) \
-        -> Tuple[list[int], list[int], list[int]]:
+async def ci_recommend(n: int, selected_cis: list[int]) -> Dict[str, list[int]]:
     pass_ci_id_or_raise(n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
-
-    if len(selected_cis) != ci_set.n_dimensions():
-        raise HTTPException(status_code=422,
-                detail="Request body must be a list of size " +
-                    f"{ci_set.n_dimensions()}, got {selected_cis}")
 
     try:
         ci_selection = model.CiSelection.from_ints(selected_cis)
@@ -43,5 +46,9 @@ async def ci_recommend(n: int, selected_cis: list[int]) \
 
     preferences = model.approximate_preferences(ci_set.select(ci_selection))
 
-    (proches, ouv, distant) = model.ci_recommend(n, ci_set, preferences)
-    return (proches.to_ints(), ouv.to_ints(), distant.to_ints())
+    (proches, ouv, distant) = model.ci_recommend(n, model.CiSelection.from_ints(selected_cis), ci_set, preferences)
+    return {
+            "proches": proches.to_ints(), 
+            "ouverture": ouv.to_ints(), 
+            "distant": distant.to_ints()
+    }
