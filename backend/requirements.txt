@@ -1,0 +1,6 @@
+mypy
+fastapi
+uvicorn[standard]
+pydantic
+numpy
+pandas
