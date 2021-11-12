@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+    proxy:
+        build:
+            context: ./
+            dockerfile: docker/frontend/Dockerfile
+            args:
+                REACT_APP_BACKEND_URL: http://localhost/api
+        ports:
+            - 80:80
+        depends_on:
+            - backend
+        #env_file:
+        #    - .env-deploy
+    backend:
+        build:
+            context: ./
+            dockerfile: docker/backend/Dockerfile
+        # ports:
+        #     - 8000:${8000}/tcp
+        #env_file:
+        #    - .env-deploy
+        environment:
+            PYTHONPATH: /app/backend/
+            FRONTEND_URL: http://localhost
+            COEFDATAFILE: "data/Cotations CI - Moyennes.csv"
+        restart: always
+
+
