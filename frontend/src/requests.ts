@@ -2,7 +2,7 @@ import {Ci, ci, CiReco, ciReco} from './core';
 import {BACKEND_URL} from './constants'
 
 export async function fetchCiRandom(n: number): Promise<Ci[]> {
-  const req = new URL("/ci_random", BACKEND_URL)
+  const req = new URL(BACKEND_URL + "/ci_random")
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString())
@@ -13,7 +13,7 @@ export async function fetchCiRandom(n: number): Promise<Ci[]> {
 
 
 export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> {
-  const req = new URL("/ci_recommend", BACKEND_URL)
+  const req = new URL(BACKEND_URL + "/ci_recommend")
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString(), {

@@ -94,7 +94,7 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[]}>
       return cis.map(ci => {
         return (
           <li key={ci.id.toString()} onClick={() => onSelectCi(ci)}>
-            {ciNames[ci.id]}
+            <a>{ciNames[ci.id]}</a>
           </li>
         );
       });

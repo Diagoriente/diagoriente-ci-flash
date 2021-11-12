@@ -10,6 +10,7 @@ const checkIsDefined = (envVarName: string): string => {
     if (envVar === undefined) {
         throw new Error(`Environment variable ${envVarName} is undefined`);
     } else {
+        console.log("Loading environment variable " + envVarName + "=" + envVar);
         return envVar;
     }
 }
