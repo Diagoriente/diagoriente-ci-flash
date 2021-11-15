@@ -1,29 +1,48 @@
 import React, {useState, useEffect} from 'react';
 import './App.css';
-import {Ci, CiReco, ciReco, ciNames} from './core';
-import {fetchCiRandom, fetchCiReco} from './requests';
+import {Ci, CiReco, ciReco, CiNames, ciNamesFromRecord} from './core';
+import {fetchCiNames, fetchCiRandom, fetchCiReco} from './requests';
 
 const App: React.FC = () => {
   const [selectedCis, setSelectedCis] = useState<Ci[]>([]);
+  const [nReco, setNReco] = useState<number>(3);
+  const [ciNames, setCiNames] = useState<CiNames>(ciNamesFromRecord({}));
 
   const addCi = (ci: Ci) => setSelectedCis([...selectedCis, ci]);
 
+  useEffect((): void => {
+    fetchCiNames()
+      .then(setCiNames)
+  }, []);
+
   return (
     <div className="App">
-      <p>CI séléctionés: {JSON.stringify(selectedCis)}</p>
-      {
-        selectedCis.length === 0 ?
-          <Start onSelectCi={addCi}/> :
-          <Reco onSelectCi={addCi} selectedCis={selectedCis} />
-      }
+      <div className="row">
+        <div className="column column-70">
+          {
+            selectedCis.length === 0 ?
+              <Start onSelectCi={addCi} ciNames={ciNames}/> :
+              <Reco onSelectCi={addCi} selectedCis={selectedCis} nReco={nReco} ciNames={ciNames} />
+          }
+        </div>
+        <div className="column">
+          <label htmlFor="n-reco">Nombre de recommendation par liste :</label>
+          <input 
+            type="number" id="n-reco" name="n-reco"
+            onChange={e => setNReco(+e.target.value)}
+            value={nReco}
+          />
+          <p>CI séléctionés: {JSON.stringify(selectedCis)}</p>
+        </div>
+      </div>
     </div>
   );
 }
 
-type OnSelectCi = { onSelectCi: (ci: Ci) => void };
+type OnSelectCi = { onSelectCi: (ci: Ci) => void, ciNames: CiNames };
 
 const Start: React.FC<OnSelectCi>
-    = ({onSelectCi}) => {
+    = ({onSelectCi, ciNames}) => {
 
   const [ci, setCi] = useState<Ci | undefined>(undefined);
 
@@ -51,7 +70,7 @@ const Start: React.FC<OnSelectCi>
   } else {
     return (
       <div>
-        <p>Êtes-vous intéressé par : {ciNames[ci.id]}</p>
+        <p>Êtes-vous intéressé par : {ciNames.get(ci)}</p>
         <div className="container">
           <div className="row">
             <div className="column">
@@ -67,18 +86,19 @@ const Start: React.FC<OnSelectCi>
   }
 }
 
-const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[]}>
-    = ({onSelectCi, selectedCis}) => {
+const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[], 
+  nReco: number, ciNames: CiNames}>
+    = ({onSelectCi, selectedCis, nReco, ciNames}) => {
   const [ciRecoState, setCiRecoState] = useState<CiReco | undefined>(undefined);
 
   useEffect(() => {
     console.log(`Fetching ci reco: ${JSON.stringify(selectedCis)}`);
-    fetchCiReco(2, selectedCis)
+    fetchCiReco(nReco, selectedCis)
       .then(res => {
         console.log(`Setting siRecoState to ${JSON.stringify(res)}`);
         setCiRecoState(res)
       });
-  }, [selectedCis]);
+  }, [selectedCis, nReco]);
 
   if (ciRecoState === undefined) {
 
@@ -94,7 +114,7 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[]}>
       return cis.map(ci => {
         return (
           <li key={ci.id.toString()} onClick={() => onSelectCi(ci)}>
-            <a>{ciNames[ci.id]}</a>
+            <a>{ciNames.get(ci)}</a>
           </li>
         );
       });
@@ -110,15 +130,15 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[]}>
         <div className="container">
           <div className="row">
             <div className="column column-30">
-              <p>Aimez-vous aussi …?</p>
+              <p>(proches)</p>
               <ul> {ciClose} </ul>
             </div>
             <div className="column column-30">
-              <p>Avez-vous pensé à …?</p>
+              <p>(ouverture)</p>
               <ul> {ciOpening} </ul>
             </div>
             <div className="column column-30">
-              <p>Ou complètement autre chose :</p>
+              <p>(distants)</p>
               <ul> {ciDistant} </ul>
             </div>
           </div>

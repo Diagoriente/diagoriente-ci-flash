@@ -1,8 +1,17 @@
-import {Ci, ci, CiReco, ciReco} from './core';
+import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord} from './core';
 import {BACKEND_URL} from './constants'
 
+export async function fetchCiNames(): Promise<CiNames> {
+  const req = new URL(BACKEND_URL + "ci_names")
+  const errorMsg =  "Could not fetch CI names.";
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(resultOrThrowHttpError<Record<number, string>>(req, errorMsg))
+    .then(r => ciNamesFromRecord(r)));
+}
+
 export async function fetchCiRandom(n: number): Promise<Ci[]> {
-  const req = new URL(BACKEND_URL + "/ci_random")
+  const req = new URL(BACKEND_URL + "ci_random")
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString())
@@ -13,7 +22,7 @@ export async function fetchCiRandom(n: number): Promise<Ci[]> {
 
 
 export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> {
-  const req = new URL(BACKEND_URL + "/ci_recommend")
+  const req = new URL(BACKEND_URL + "ci_recommend")
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString(), {
