@@ -52,6 +52,10 @@ class CiSelection:
     def contains(self, ci_id: CiId) -> bool:
         return ci_id in self.ids
 
+    def union(self, other: "CiSelection") -> "CiSelection":
+        id_set = set(self.ids) | set(other.ids)
+        return CiSelection(ids = list(id_set))
+
 
 
 @dataclass(frozen = True)
@@ -134,12 +138,28 @@ def ci_ouverture(ci_set: CiSet, preferences: Model) -> CiSelection:
     return CiSelection.from_ints(ids_list)
 
 
-def ci_recommend(n: int, ci_selected: CiSet,  ci_set: CiSet, preferences: Model) \
+def ci_recommend(n: int, ci_selected: CiSelection,  ci_set: CiSet, preferences: Model) \
         -> Tuple[CiSelection, CiSelection, CiSelection]:
-    proches = CiSelection(ids = [ci for ci in ci_proches(ci_set, preferences)
-        if not ci_selected.contains(ci)])
-    distants = CiSelection(ids = list(reversed(proches.ids)))
+
+    exclude = ci_selected
+    ci_by_proximity: CiSelection = CiSelection(ids =
+            [ci for ci in ci_proches(ci_set, preferences)
+                if not ci_selected.contains(ci)])
+    proches = ci_by_proximity[:n]
+
+    exclude = exclude.union(proches)
     ouv = CiSelection(ids = [ci for ci in ci_ouverture(ci_set, preferences)
-        if not ci_selected.contains(ci)])
-    return (proches[:n], ouv[:n], distants[:n])
+        if not exclude.contains(ci)][:n])
+
+    exclude = exclude.union(ouv)
+    distants_list: list[CiId] = []
+    for ci in reversed(ci_by_proximity.ids):
+        if len(distants_list) < n:
+            if not exclude.contains(ci):
+                distants_list.append(ci)
+        else:
+            break
+    distants = CiSelection(ids = distants_list)
+
+    return (proches, ouv, distants)
 

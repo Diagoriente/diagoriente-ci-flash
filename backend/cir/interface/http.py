@@ -7,7 +7,7 @@ from typing import Optional, Any, Tuple, Dict
 
 app = FastAPI()
 
-ci_set = ci_set_from_csv(constants.COEFDATAFILE)
+ci_names, ci_set = ci_set_from_csv(constants.COEFDATAFILE)
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,6 +20,11 @@ app.add_middleware(
 def pass_ci_id_or_raise(i: int, msg: str) -> None:
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
+
+
+@app.get("/ci_names")
+async def get_ci_names() -> dict[int, str]:
+    return dict(enumerate(ci_names))
 
 
 @app.get("/ci_random")

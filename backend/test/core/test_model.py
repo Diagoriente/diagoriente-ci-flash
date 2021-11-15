@@ -44,3 +44,8 @@ def test_ci_ouverture() -> None:
     res = ci_ouverture(ci_set, preferences)
     assert res == CiSelection.from_ints([3, 1, 4, 2, 0])
 
+
+def test_ci_selection_union() -> None:
+    ci_sel_1 = CiSelection.from_ints([1,2,3])
+    ci_sel_2 = CiSelection.from_ints([3,4,5])
+    assert sorted(ci_sel_1.union(ci_sel_2).to_ints()) == [1,2,3,4,5]
