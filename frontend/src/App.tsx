@@ -32,7 +32,10 @@ const App: React.FC = () => {
             onChange={e => setNReco(+e.target.value)}
             value={nReco}
           />
-          <p>CI séléctionés: {JSON.stringify(selectedCis)}</p>
+          <p>CI séléctionés:</p>
+          <ul>
+            {selectedCis.slice().reverse().map(ci => <li key={ci.id}>{ciNames.get(ci)}</li>)}
+          </ul>
         </div>
       </div>
     </div>
