@@ -3,8 +3,7 @@ none:
 
 define rsync_ovh
 rsync -irtptPl --delete --info=progress2 \
-    -e 'ssh -p 56185' \
-    . debian@51.178.19.169:Diagoriente \
+    . ovh-vps-test:Diagoriente \
     --exclude .git \
     --exclude frontend/node_modules \
     --exclude frontend/build \
@@ -39,6 +38,11 @@ docker-build:
 .PHONY: docker-up
 docker-up:
 	docker-compose -f docker/docker-compose.yaml --project-directory ./ up --build -d
+
+.PHONY: deploy
+deploy: sync-ovh .env-deploy
+	rsync -rtptPl .env-deploy ovh-vps-test:Diagoriente/.env-deploy
+	ssh ovh-vps-test bash -c "'cd Diagoriente && set -a && . .env-deploy && make docker-up'"
 
 .PHONY: docker-down
 docker-down:
