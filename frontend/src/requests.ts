@@ -1,4 +1,5 @@
-import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord} from './core';
+import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores,
+  ciScoresFromRecord} from './core';
 import {BACKEND_URL} from './constants'
 
 export async function fetchCiNames(): Promise<CiNames> {
@@ -33,6 +34,16 @@ export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> 
     .then(resultOrThrowHttpError<CiRecoResponse>(req, errorMsg))
     .then((r: CiRecoResponse) =>
         ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))));
+}
+
+export async function fetchCiScores(ci: Ci): Promise<CiScores> {
+  const req = new URL(BACKEND_URL + "ci_scores")
+  req.searchParams.set("ci", ci.id.toString());
+  const errorMsg =  "Could not fetch CI scores.";
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(resultOrThrowHttpError<CiScores>(req, errorMsg))
+    .then(r => ciScoresFromRecord(r)));
 }
 
 type CiRecoResponse = {

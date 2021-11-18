@@ -57,3 +57,13 @@ async def ci_recommend(n: int, selected_cis: list[int]) -> Dict[str, list[int]]:
             "ouverture": ouv.to_ints(), 
             "distant": distant.to_ints()
     }
+
+@app.get("/ci_scores")
+async def ci_scores(ci: int) -> Dict[int, Dict[str,float]]:
+    pref = model.approximate_preferences(ci_set.select(model.CiSelection.from_ints([ci])))
+    score_distance = model.prox(ci_set, pref)
+    score_ouv = model.ouv(ci_set, pref)
+    return {ci_id.val:
+             {"distance": score_distance[ci_id.val],
+              "ouverture": score_ouv[ci_id.val]}
+           for ci_id in ci_set.ids if ci_id.val != ci}

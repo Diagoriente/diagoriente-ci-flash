@@ -20,14 +20,42 @@ export const ciReco = (ciClose: Ci[], ciOpening: Ci[], ciDistant: Ci[]):
 export type CiNames = {
   map: Record<number, string>;
   get: (ci: Ci) => string;
+  array: () => {ci: Ci, name: string}[];
 }
 
 export const ciNamesFromRecord = (rec: Record<number, string>): CiNames => {
   return {
     map: rec,
-    get: (ci: Ci): string => rec[ci.id]
+    get: (ci: Ci): string => rec[ci.id],
+    array: (): {ci: Ci, name: string}[] => {
+      return Object.entries(rec).map(([ciId, ciName]) => { 
+        return{ci: ci(+ciId), name: ciName}
+      });
+    },
   };
 };
+
+export type CiScoreVals = {distance: number; ouverture: number};
+
+export type CiScores = {
+  map: Record<number, CiScoreVals>;
+  get: (ci: Ci) => CiScoreVals;
+  distanceAsc: (ciNames: CiNames) => {name: string, val: number}[];
+  ouvertureDesc: (ciNames: CiNames) => {name: string, val: number}[];
+};
+
+export const ciScoresFromRecord = (rec: Record<number, CiScoreVals>): CiScores => {
+  return {
+    map: rec,
+    get: (ci: Ci): CiScoreVals => rec[ci.id],
+    distanceAsc: (ciNames: CiNames): {name: string, val: number}[] => Object.entries(rec)
+      .map(([ciId, score]) => {return{name: ciNames.get(ci(+ciId)), val: score.distance}}),
+    ouvertureDesc: (ciNames: CiNames): {name: string, val: number}[] => Object.entries(rec)
+      .map(([ciId, score]) => {return{name: ciNames.get(ci(+ciId)), val: score.ouverture}}),
+  };
+};
+
+
 
 //export const ciNames: Record[]
 //   "Travailler à mon compte",

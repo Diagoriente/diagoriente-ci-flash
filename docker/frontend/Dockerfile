@@ -4,6 +4,7 @@ COPY frontend/package.json /usr/local/src/frontend/package.json
 COPY frontend/package-lock.json /usr/local/src/frontend/package-lock.json
 WORKDIR /usr/local/src/frontend
 RUN npm install --production
+RUN npm i --save-dev @types/d3
 
 COPY frontend/ /usr/local/src/frontend
 ARG REACT_APP_BACKEND_URL

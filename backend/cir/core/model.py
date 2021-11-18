@@ -107,13 +107,6 @@ def prox(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
     return res
 
 
-def ci_random(n: int, ci_set: CiSet) -> CiSelection:
-    ids: list[CiId] = ci_set.ids.ids
-    random_selection = rg.choice(len(ids), size = n, replace = False).tolist()
-    result = CiSelection.from_ints(random_selection)
-    return result
-
-
 def ouv(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
     (n_ci, n_axes) = ci_set.axes.shape
     abs_diff: npt.NDArray[np.float64] = np.abs(ci_set.axes - preferences.axes)
@@ -123,6 +116,13 @@ def ouv(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
         o_i[i] = -1
         res = np.array([res, np.sum(abs_diff * o_i, axis = 1)]).max(axis = 0)
     return res
+
+
+def ci_random(n: int, ci_set: CiSet) -> CiSelection:
+    ids: list[CiId] = ci_set.ids.ids
+    random_selection = rg.choice(len(ids), size = n, replace = False).tolist()
+    result = CiSelection.from_ints(random_selection)
+    return result
 
 
 def ci_proches(ci_set: CiSet, preferences: Model) -> CiSelection:
