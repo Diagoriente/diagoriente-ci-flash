@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 docker-compose = docker-compose -f docker/docker-compose.yaml --project-directory ./
 
 none:
@@ -17,16 +19,9 @@ rsync -irtptPl --delete --info=progress2 \
     --exclude .envrc
 endef
 
-.PHONY:up-dev
-up-dev: backend-up-dev frontend-up-dev
-
-.PHONY:frontend-up-dev
-frontend-up-dev:
-	cd frontend && npm start
-
-.PHONY:backend-up-dev
-backend-up-dev:
-	uvicorn cir.interface.http:app --reload &
+.PHONY:dev-up
+dev-up:
+	./dev-up.sh
 
 .PHONY:sync-ovh
 sync-ovh:
@@ -35,7 +30,7 @@ sync-ovh:
 
 .PHONY: docker-build
 docker-build:
-	$(docker-compose) build
+	$(docker-compose) --env-file build
 
 .PHONY: docker-up
 docker-up:
