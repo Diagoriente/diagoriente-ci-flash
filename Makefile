@@ -39,15 +39,13 @@ docker-build:
 
 .PHONY: docker-up
 docker-up:
-	set -a && . .env-docker-local && $(docker-compose) up --build -d
+	$(docker-compose) --env-file .env-docker-local up --build -d
 
 .PHONY: deploy
 deploy: sync-ovh .env-deploy
 	rsync -rtptPl .env-deploy ovh-vps-test:Diagoriente/.env-deploy
 	ssh ovh-vps-test bash -c "'cd Diagoriente \
-		&& set -a \
-		&& . .env-deploy \
-		&& $(docker-compose) up --build -d'"
+		&& $(docker-compose) --env-file .env-deploy up --build -d'"
 
 .PHONY: docker-down
 docker-down:
