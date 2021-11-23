@@ -1,19 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import './App.css';
-import {Ci, ci, ciListFromString, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores} from './core';
-import {fetchCiNames, fetchCiRandom, fetchCiReco, fetchCiScores} from './requests';
-import * as d3 from 'd3';
-import {BarChart} from './d3/horizontal-bar-chart';
-import useCiNames from './hooks/use-ci-names';
-import Start from './components/start';
-import Reco from './components/reco';
+import {Ci} from 'types/types';
+import {ciListFromString} from 'utils/helpers/Ci';
+import useCiNames from 'hooks/useCiNames';
+import Start from 'views/Reco/Start';
+import Step from 'views/Reco/Step';
 import {useSearchParams} from 'react-router-dom';
 
 
-export const UserPath: React.FC = () => {
+export const Reco: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [nReco, setNReco] = useState<number>(3);
-  const [ciNames, setCiNames] = useCiNames();
+  const ciNames = useCiNames();
   const [selectedCis, setSelectedCis] =
     useState<Ci[]>(ciListFromString(searchParams.get("selectedCis")));
 
@@ -25,7 +22,7 @@ export const UserPath: React.FC = () => {
     searchParams.set("selectedCis",
        selectedCis.map(ci => ci.id.toString()).join(","));
     setSearchParams(searchParams);
-  }, [selectedCis]);
+  }, [selectedCis, searchParams, setSearchParams]);
 
   return (
     <div className="row">
@@ -33,7 +30,7 @@ export const UserPath: React.FC = () => {
         {
           selectedCis.length === 0 ?
             <Start onYes={addCi} ciNames={ciNames}/> :
-            <Reco 
+            <Step 
               onSelectCi={addCi}
               selectedCis={selectedCis}
               nReco={nReco}
@@ -57,4 +54,4 @@ export const UserPath: React.FC = () => {
   );
 };
 
-export default UserPath;
+export default Reco;

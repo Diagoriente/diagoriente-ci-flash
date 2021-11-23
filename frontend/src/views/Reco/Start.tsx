@@ -1,8 +1,6 @@
+import {Ci, CiNames} from "types/types";
 import React, {useState, useEffect} from 'react';
-import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores} from '../core';
-import {fetchCiNames, fetchCiRandom, fetchCiReco, fetchCiScores} from '../requests';
-import {Outlet, NavLink} from 'react-router-dom';
-import useCiNames from '../hooks/use-ci-names';
+import {fetchCiRandom} from 'services/backend';
 
 
 const Start: React.FC<{ onYes: (ci: Ci) => void, ciNames: CiNames }>

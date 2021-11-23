@@ -1,11 +1,11 @@
+import {Ci, CiScores, GraphType} from "types/types";
+import {ci, ciFromString} from "utils/helpers/Ci";
+import {graphType} from "utils/helpers/GraphType";
+import useCiNames from "hooks/useCiNames";
+import {fetchCiScores} from "services/backend";
 import React, {useState, useEffect} from 'react';
-import './App.css';
-import {Ci, ci, ciFromString, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores, GraphType,
-graphType} from './core';
-import {fetchCiNames, fetchCiRandom, fetchCiReco, fetchCiScores} from './requests';
 import * as d3 from 'd3';
-import {BarChart} from './d3/horizontal-bar-chart';
-import useCiNames from './hooks/use-ci-names';
+import HorizontalBarChart from "views/VisuScores/HorizontalBarChart";
 import {useSearchParams} from 'react-router-dom';
 
 const VisuScores: React.FC = () => {
@@ -22,19 +22,17 @@ const VisuScores: React.FC = () => {
 
   const [ciDist, setCiDist] = useState<{name: string, val: number}[]>([]);
   const [ciOuv, setCiOuv] = useState<{name: string, val: number}[]>([]);
-  const [ciNames, setCiNames] = useCiNames();
+  const ciNames = useCiNames();
 
   useEffect(() => {
-    console.log("EFFECT UPDATE GRAPH TYPE SP");
     searchParams.set("graphType", curGraphType);
     setSearchParams(searchParams);
-  }, [curGraphType]);
+  }, [curGraphType, searchParams, setSearchParams]);
 
   useEffect(() => {
-    console.log("EFFECT UPDATE CI SP");
     searchParams.set("ci", curCi.id.toString());
     setSearchParams(searchParams);
-  }, [curCi]);
+  }, [curCi, searchParams, setSearchParams]);
 
   useEffect(() => {
       fetchCiScores(curCi).then((ciScores: CiScores): void => {
@@ -53,11 +51,11 @@ const VisuScores: React.FC = () => {
         break;
       case "ouverture":
         xLabel = `Ouverture par rapport centre d'intéret "${ciNames.get(curCi)}"`;
-        yDomain = d3.groupSort(ciDist, ([d]) => -d.val, d => d.name);
+        yDomain = d3.groupSort(ciOuv, ([d]) => -d.val, d => d.name);
         break;
     }
 
-    const barChart = BarChart(ciDist, {
+    const barChart = HorizontalBarChart(ciDist, {
       x: d => d.val,
       y: (d, i) => d.name,
       title: (d: any): string => `${d3.format(".2f")(d.val)}`,
@@ -79,7 +77,7 @@ const VisuScores: React.FC = () => {
     return () => {
       barChart?.remove();
     };
-  }, [curGraphType, curCi, ciDist, ci, ciNames]);
+  }, [curGraphType, curCi, ciDist, ciOuv, ciNames]);
 
   return (
     <div className="App">

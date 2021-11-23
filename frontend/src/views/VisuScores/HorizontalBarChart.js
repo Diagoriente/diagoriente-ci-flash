@@ -3,7 +3,7 @@
 // https://observablehq.com/@d3/horizontal-bar-chart
 import * as d3 from 'd3';
 
-export function BarChart(data, {
+export function HorizontalBarChart(data, {
   x = d => d, // given d in data, returns the (quantitative) x-value
   y = (d, i) => i, // given d in data, returns the (ordinal) y-value
   title, // given d in data, returns the title text
@@ -111,3 +111,5 @@ export function BarChart(data, {
 
   return svg.node();
 }
+
+export default HorizontalBarChart;

@@ -1,6 +1,9 @@
-import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores,
-  ciScoresFromRecord} from './core';
-import {BACKEND_URL} from './constants'
+import {Ci, CiNames, CiReco, CiScores} from 'types/types';
+import {ci} from 'utils/helpers/Ci';
+import {ciNamesFromRecord} from 'utils/helpers/CiNames';
+import {ciReco} from 'utils/helpers/CiReco';
+import {ciScoresFromRecord} from 'utils/helpers/CiScores';
+import {BACKEND_URL} from 'utils/constants'
 
 export async function fetchCiNames(): Promise<CiNames> {
   const req = new URL(BACKEND_URL + "ci_names")
@@ -26,6 +29,13 @@ export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> 
   const req = new URL(BACKEND_URL + "ci_recommend")
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
+
+  type CiRecoResponse = {
+      proches: number[];
+      ouverture: number[];
+      distant: number[];
+  }
+
   return (fetch(req.toString(), {
       method: "POST",
       headers: {'Content-Type': 'application/json;charset=utf-8'},
@@ -36,6 +46,7 @@ export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> 
         ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))));
 }
 
+
 export async function fetchCiScores(ci: Ci): Promise<CiScores> {
   const req = new URL(BACKEND_URL + "ci_scores")
   req.searchParams.set("ci", ci.id.toString());
@@ -44,12 +55,6 @@ export async function fetchCiScores(ci: Ci): Promise<CiScores> {
     .catch(throwNetworkError(req, errorMsg))
     .then(resultOrThrowHttpError<CiScores>(req, errorMsg))
     .then(r => ciScoresFromRecord(r)));
-}
-
-type CiRecoResponse = {
-    proches: number[];
-    ouverture: number[];
-    distant: number[];
 }
 
 class NetworkError extends Error {

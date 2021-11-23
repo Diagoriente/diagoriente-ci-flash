@@ -1,14 +1,10 @@
+import {Ci, CiNames, CiReco} from "types/types";
 import React, {useState, useEffect} from 'react';
-import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores} from '../core';
-import {fetchCiNames, fetchCiRandom, fetchCiReco, fetchCiScores} from '../requests';
-import * as d3 from 'd3';
-import {Outlet, NavLink} from 'react-router-dom';
-import useCiNames from '../hooks/use-ci-names';
+import {NavLink} from 'react-router-dom';
+import {fetchCiReco} from 'services/backend';
 
 
-
-
-const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[], 
+const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
   nReco: number, ciNames: CiNames}>
     = ({onSelectCi, selectedCis, nReco, ciNames}) => {
   const [ciRecoState, setCiRecoState] = useState<CiReco | undefined>(undefined);
@@ -36,7 +32,7 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
       return cis.map(ci => {
         return (
           <li key={ci.id.toString()} onClick={() => onSelectCi(ci)}>
-            <a>{ciNames.get(ci)}</a>
+            {ciNames.get(ci)}
           </li>
         );
       });
@@ -76,4 +72,4 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
   }
 }
 
-export default Reco;
+export default Step;

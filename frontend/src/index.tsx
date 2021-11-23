@@ -4,18 +4,18 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import VisuScores from "./visu-scores";
-import UserPath from "./user-path";
+import VisuScores from "views/VisuScores/VisuScores";
+import Reco from "views/Reco/Reco";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />}>
-            <Route index element={<UserPath />} />
-            <Route path="user-path" element={<UserPath />} />
-            <Route path="visu-scores" element={<VisuScores />} />
-            <Route 
+            <Route index element={<Reco />} />
+            <Route path="Reco" element={<Reco />} />
+            <Route path="VisuScores" element={<VisuScores />} />
+            <Route
               path="*"
               element={
                 <p>There's nothing here!</p>
