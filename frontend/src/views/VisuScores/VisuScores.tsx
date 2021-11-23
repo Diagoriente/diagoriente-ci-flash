@@ -44,18 +44,21 @@ const VisuScores: React.FC = () => {
   useEffect(() => {
     let xLabel;
     let yDomain;
+    let data;
     switch(curGraphType) {
       case "distance":
         xLabel = `Distance du centre d'intéret "${ciNames.get(curCi)}"`;
         yDomain = d3.groupSort(ciDist, ([d]) => d.val, d => d.name);
+        data = ciDist;
         break;
       case "ouverture":
         xLabel = `Ouverture par rapport centre d'intéret "${ciNames.get(curCi)}"`;
         yDomain = d3.groupSort(ciOuv, ([d]) => -d.val, d => d.name);
+        data = ciOuv;
         break;
     }
 
-    const barChart = HorizontalBarChart(ciDist, {
+    const barChart = HorizontalBarChart(data, {
       x: d => d.val,
       y: (d, i) => d.name,
       title: (d: any): string => `${d3.format(".2f")(d.val)}`,
@@ -63,8 +66,7 @@ const VisuScores: React.FC = () => {
       width: 640,
       marginLeft:400,
       xDomain: [0, 
-        ciDist.map(({val}) => val).reduce((a, b) => Math.max(a,b), 0)],
-      //yDomain: ciDist.map(({name}) => name),
+        data.map(({val}) => val).reduce((a, b) => Math.max(a,b), 0)],
       yDomain: yDomain,
       xFormat: "",
       xLabel: xLabel,
