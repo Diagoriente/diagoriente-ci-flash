@@ -31,8 +31,8 @@ const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
     const mapCisToElements = (cis: Ci[]): JSX.Element[]  => {
       return cis.map(ci => {
         return (
-          <li key={ci.id.toString()} onClick={() => onSelectCi(ci)}>
-            {ciNames.get(ci)}
+          <li key={ci.id.toString()}>
+            <button className="w-full bg-indigo-200 ring-indigo-500 text-black" onClick={() => onSelectCi(ci)}>{ciNames.get(ci)}</button>
           </li>
         );
       });
@@ -43,28 +43,26 @@ const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
     const ciDistant = mapCisToElements(ciRecoState.ciDistant);
 
     return (
-      <div>
+      <div className="space-y-5">
         <p>Choisissez un autre centre d'intérêt (ou 
           <NavLink reloadDocument
             style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
-            to="/user-path">
+            to="/Reco">
              recommencez
           </NavLink>
         )</p>
-        <div className="container">
-          <div className="row">
-            <div className="column column-30">
-              <p>(proches)</p>
-              <ul> {ciClose} </ul>
-            </div>
-            <div className="column column-30">
-              <p>(ouverture)</p>
-              <ul> {ciOpening} </ul>
-            </div>
-            <div className="column column-30">
-              <p>(distants)</p>
-              <ul> {ciDistant} </ul>
-            </div>
+        <div className="flex space-x-5">
+          <div className="w-1/3 space-y-4">
+            <p className="text-center">(proches)</p>
+            <ul className="space-y-2"> {ciClose} </ul>
+          </div>
+          <div className="w-1/3 space-y-4">
+            <p className="text-center">(ouverture)</p>
+            <ul className="space-y-2"> {ciOpening} </ul>
+          </div>
+          <div className="w-1/3 space-y-4">
+            <p className="text-center">(distants)</p>
+            <ul className="space-y-2"> {ciDistant} </ul>
           </div>
         </div>
       </div>

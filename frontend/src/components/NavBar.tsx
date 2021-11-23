@@ -3,23 +3,26 @@ import {NavLink} from 'react-router-dom';
 
 const NavBar: React.FC = () => {
   return (
-      <nav>
-        <ol style={{display: "flex", gap: "2em"}}>
-        <li>
-          <NavLink reloadDocument
-            style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
-            to="/Reco">
-            Chemin Utilisateur
-          </NavLink>
-        </li>
-        <li>
-          <NavLink reloadDocument
-            style={({isActive}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
-            to="/VisuScores">
-            Visualiser les scores
-          </NavLink>
-        </li>
-        </ol>
+      <nav className="flex space-x-10">
+        <p>Navigation: </p>
+        <ul className="flex space-x-10">
+          <li>
+            <NavLink reloadDocument
+              className={({isActive}: {isActive: boolean}) => 
+                isActive ? "font-bold" : ""}
+              to="/Reco">
+              Recommandation de CI
+            </NavLink>
+          </li>
+          <li>
+            <NavLink reloadDocument
+              className={({isActive}: {isActive: boolean}) => 
+                isActive ? "font-bold" : ""}
+              to="/VisuScores">
+              Visualiser les scores
+            </NavLink>
+          </li>
+        </ul>
       </nav>
   );
 }

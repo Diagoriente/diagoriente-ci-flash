@@ -71,6 +71,7 @@ const VisuScores: React.FC = () => {
       xFormat: "",
       xLabel: xLabel,
       yRange: undefined,
+      color: "#3730A3"
     });
 
 
@@ -82,34 +83,38 @@ const VisuScores: React.FC = () => {
   }, [curGraphType, curCi, ciDist, ciOuv, ciNames]);
 
   return (
-    <div className="App">
-      <label htmlFor="vis-score-graph-type">Visualiser</label>
-      <select 
-        name="vis-score-graph-type" 
-        id="vis-score-graph-type"
-        defaultValue={curGraphType}
-        onChange={e => setCurGraphType(e.target.value as GraphType)}
-      >
-        <option key="distance" value="distance">
-          la distance
-        </option>
-        <option key="ouverture" value="ouverture">
-          le score d'ouverture
-        </option>
-      </select>
-      <label htmlFor="vis-score-cur-ci">par rapport au centre d'intérêt :</label>
-      <select 
-        name="vis-score-cur-ci" 
-        id="vis-score-cur-ci"
-        defaultValue={curCi.id}
-        onChange={e => setCurCi(ci(+e.target.value))}
-      >
-        {ciNames.array().map(({ci, name}) => 
-             <option key={ci.id} value={ci.id}>
-               {name}
-             </option>)}
-      </select>
-      <div id="visu-scores"></div>
+    <div className="flex-col space-y-5">
+      <div className="text-center">
+        <label htmlFor="vis-score-graph-type">Visualiser</label>
+        <select 
+          className="rounded bg-indigo-200"
+          name="vis-score-graph-type" 
+          id="vis-score-graph-type"
+          defaultValue={curGraphType}
+          onChange={e => setCurGraphType(e.target.value as GraphType)}
+        >
+          <option key="distance" value="distance">
+            la distance
+          </option>
+          <option key="ouverture" value="ouverture">
+            le score d'ouverture
+          </option>
+        </select>
+        <label htmlFor="vis-score-cur-ci">par rapport au centre d'intérêt :</label>
+        <select 
+          className="rounded bg-indigo-200"
+          name="vis-score-cur-ci" 
+          id="vis-score-cur-ci"
+          defaultValue={curCi.id}
+          onChange={e => setCurCi(ci(+e.target.value))}
+        >
+          {ciNames.array().map(({ci, name}) => 
+               <option key={ci.id} value={ci.id}>
+                 {name}
+               </option>)}
+        </select>
+      </div>
+      <div id="visu-scores" className="flex justify-center"></div>
     </div>
   );
 };

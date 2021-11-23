@@ -1,11 +1,10 @@
 import React from 'react';
-import './App.css';
 import {Outlet} from 'react-router-dom';
 import NavBar from 'components/NavBar';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
+    <div className="p-1 space-y-5">
       <NavBar />
       <Outlet />
     </div>

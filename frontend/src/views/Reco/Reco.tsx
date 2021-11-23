@@ -25,8 +25,8 @@ export const Reco: React.FC = () => {
   }, [selectedCis, searchParams, setSearchParams]);
 
   return (
-    <div className="row">
-      <div className="column column-70">
+    <div className="flex space-x-20 items-start">
+      <div className="w-4/6">
         {
           selectedCis.length === 0 ?
             <Start onYes={addCi} ciNames={ciNames}/> :
@@ -38,15 +38,18 @@ export const Reco: React.FC = () => {
             />
         }
       </div>
-      <div className="column">
-        <label htmlFor="n-reco">Nombre de recommendation par liste :</label>
-        <input 
-          type="number" id="n-reco" name="n-reco"
-          onChange={e => setNReco(+e.target.value)}
-          value={nReco}
-        />
+      <div className="rounded p-5 border-4 border-light-blue-500 border-opacity-100 space-y-2">
+        <div className="">
+          <label className="inline" htmlFor="n-reco">Nombre de recommandations par liste :</label>
+          <input 
+            className="inline w-16 border-solid border-2 border-indigo-500 text-right"
+            type="number" id="n-reco" name="n-reco"
+            onChange={e => setNReco(+e.target.value)}
+            value={nReco}
+          />
+        </div>
         <p>CI séléctionés:</p>
-        <ul>
+        <ul className="list-disc list-outside pl-4">
           {selectedCis.slice().reverse().map(ci => <li key={ci.id}>{ciNames.get(ci)}</li>)}
         </ul>
       </div>

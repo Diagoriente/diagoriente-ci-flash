@@ -31,17 +31,11 @@ const Start: React.FC<{ onYes: (ci: Ci) => void, ciNames: CiNames }>
     );
   } else {
     return (
-      <div>
-        <p>Êtes-vous intéressé par : {ciNames.get(ci)}</p>
-        <div className="container">
-          <div className="row">
-            <div className="column">
-              <button onClick={() => onYes(ci)}>Oui</button>
-            </div>
-            <div className="column">
-              <button onClick={() => getNewRandomCi()}>Non</button>
-            </div>
-          </div>
+      <div className="flex-col space-y-2">
+        <p className="text-center">Êtes-vous intéressé par : {ciNames.get(ci)}</p>
+        <div className="flex justify-center space-x-10">
+          <button onClick={() => onYes(ci)}>Oui</button>
+          <button onClick={() => getNewRandomCi()}>Non</button>
         </div>
       </div>
     );
