@@ -1,3 +1,5 @@
+docker-compose = docker-compose -f docker/docker-compose.yaml --project-directory ./
+
 none:
 	@echo "Please enter a target expliticly."
 
@@ -33,20 +35,23 @@ sync-ovh:
 
 .PHONY: docker-build
 docker-build:
-	docker-compose -f docker/docker-compose.yaml --project-directory ./ build
+	$(docker-compose) build
 
 .PHONY: docker-up
 docker-up:
-	docker-compose -f docker/docker-compose.yaml --project-directory ./ up --build -d
+	set -a && . .env-docker-local && $(docker-compose) up --build -d
 
 .PHONY: deploy
 deploy: sync-ovh .env-deploy
 	rsync -rtptPl .env-deploy ovh-vps-test:Diagoriente/.env-deploy
-	ssh ovh-vps-test bash -c "'cd Diagoriente && set -a && . .env-deploy && make docker-up'"
+	ssh ovh-vps-test bash -c "'cd Diagoriente \
+		&& set -a \
+		&& . .env-deploy \
+		&& $(docker-compose) up --build -d'"
 
 .PHONY: docker-down
 docker-down:
-	docker-compose -f docker/docker-compose.yaml --project-directory ./ down
+	$(docker-compose) down
 
 Readme.html: Readme.md
 	pandoc --toc --standalone --mathjax=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js -f markdown -t html Readme.md -o Readme.html

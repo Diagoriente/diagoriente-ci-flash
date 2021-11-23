@@ -4,8 +4,9 @@ import {Ci, ci, CiReco, ciReco, CiNames, ciNamesFromRecord, CiScores} from './co
 import {fetchCiNames, fetchCiRandom, fetchCiReco, fetchCiScores} from './requests';
 import * as d3 from 'd3';
 import {BarChart} from './d3/horizontal-bar-chart';
-import {Outlet, NavLink} from 'react-router-dom';
+import {Outlet, Link, NavLink} from 'react-router-dom';
 import useCiNames from './hooks/use-ci-names';
+import QueryNavLink from './components/query-nav-link';
 
 const App: React.FC = () => {
   return (
@@ -13,14 +14,14 @@ const App: React.FC = () => {
       <nav>
         <ol style={{display: "flex", gap: "2em"}}>
         <li>
-          <NavLink 
-            style={({isActive}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
+          <NavLink reloadDocument
+            style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
             to="/user-path">
             Chemin Utilisateur
           </NavLink>
         </li>
         <li>
-          <NavLink 
+          <NavLink reloadDocument
             style={({isActive}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
             to="/visu-scores">
             Visualiser les scores

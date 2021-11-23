@@ -5,9 +5,8 @@ import {Outlet, NavLink} from 'react-router-dom';
 import useCiNames from '../hooks/use-ci-names';
 
 
-
-const Start: React.FC<{ onSelectCi: (ci: Ci) => void, ciNames: CiNames }>
-    = ({onSelectCi, ciNames}) => {
+const Start: React.FC<{ onYes: (ci: Ci) => void, ciNames: CiNames }>
+    = ({onYes, ciNames}) => {
 
   const [ci, setCi] = useState<Ci | undefined>(undefined);
 
@@ -39,7 +38,7 @@ const Start: React.FC<{ onSelectCi: (ci: Ci) => void, ciNames: CiNames }>
         <div className="container">
           <div className="row">
             <div className="column">
-              <button onClick={() => onSelectCi(ci)}>Oui</button>
+              <button onClick={() => onYes(ci)}>Oui</button>
             </div>
             <div className="column">
               <button onClick={() => getNewRandomCi()}>Non</button>

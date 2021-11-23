@@ -48,7 +48,13 @@ const Reco: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
 
     return (
       <div>
-        <p>Choisissez un autre centre d'intérêt</p>
+        <p>Choisissez un autre centre d'intérêt (ou 
+          <NavLink reloadDocument
+            style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
+            to="/user-path">
+             recommencez
+          </NavLink>
+        )</p>
         <div className="container">
           <div className="row">
             <div className="column column-30">
