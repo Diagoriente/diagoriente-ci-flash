@@ -5,7 +5,8 @@
 **Contexte:** Lors de son parcours sur Diagoriente, un utilisateur est amené à
 sélectionner ses centres d'intérêts (CI) parmis 154 disponibles pour lui
 présenter des métiers susceptibles de l'intéresser. Chaque CI est annoté sur 7
-axes avec une valeur entre -10 et 10. Ces valeurs sont invisibles pour les
+axes avec une valeur entre -10 et 10, ou la valeur NA lorsque ce CI n'a pas de
+valeur associée à cet axe. Ces valeurs sont invisibles pour les
 utilisateurs mais sont utilisées pour faire des recommandations. Les axes sont:
 
 - Affaire—Assistance
@@ -59,19 +60,34 @@ L'utilisateur est amené à sélectionner successivement des centres d'intérêt
 note la séquence des centres d'intérêts sélectionnés par 
 $(\vec c_t)_{1 <= t <= N}$ où $N = 154$ est le nombre de CI.
 
-Après chaque sélection, on approxime $\vec\theta$ par la moyenne des 
-CI sélectionnés jusque là :
+Après chaque sélection, on approxime $\vec\theta$ en prenant la moyenne des CI
+sélectionnés jusque là en ignorant les NA. L'estimateur à l'étape $t$ est noté
+$\vec\theta_t = (\theta_{t1},\theta_{t2},\dots,\theta_{td})$ et :
 
 $$
-\vec\theta_t = \frac{\sum_{1 \le i \le t} \vec c_i}{t}.
+\theta_{tj} = {
+  {\displaystyle
+    \sum_{\substack{i, 1 \le i \le t, \\ c_{ij} \ne \mathrm{NA}}}
+    \vec c_{ij}
+  }
+  \over 
+  |\{i, c_{ij} \ne \mathrm{NA}\}|}.
 $$
+
+Si tous les CI sélectionnés valent $\mathrm{NA}$ sur un axe $j$, alors 
+$\theta_{tj} = NA$.
 
 Pour recommander des centres d'intérêts proches ou éloignés des préférences d'un
-utilisateur, on utilise comme mesure de proximité entre un centre d'intérêt $c$
-et les préférences $\vec\theta_t$ la distance euclidienne :
+utilisateur, on utilise comme mesure de proximité entre un centre d'intérêt
+$\vec c = (c_1, \dots, c_d)$ et les préférences $\vec\theta_t$ la différence 
+absolue moyennée sur tous les axes, en ignorant les $\mathrm{NA}$ :
 
 $$
-\operatorname{prox}(\vec c, \vec\theta_t) = || \vec c - \vec\theta_t ||.
+\operatorname{prox}(\vec c, \vec\theta_t) = {
+  {\displaystyle\sum_{1 \le j \le d} |c_j - \theta_{tj}|}
+  \over
+  {|\{j, c_j \ne \mathrm{NA} \textrm{ et } \theta_{tj} \ne \mathrm{NA}\}|}.
+}
 $$
 
 Les CI proches à l'instant $t$ sont donnés du plus proches au plus éloignés par
@@ -79,20 +95,23 @@ la séquence des CI $C^P_t = (c_i)_{1 \le i \le N}$ triés par
 $\operatorname{prox}(\vec c, \vec\theta_t)$ croissant. Les CI éloignés à 
 l'instant $t$ sont donnés par cette même séquence prise dans l'ordre inverse.
 
-Pour recommander des centres d'intérêts d'ouverture, proches des préférences de
-l'utilisateur sur tous les axes sauf un, on utilise la mesure
+Pour recommander des centres d'intérêts d'ouverture, on cherche les centres
+d'intérêts proches des préférences de l'utilisateur sur tous les axes sauf un. 
+Le vecteur $\vec e = (e_1, \dots, e_d)$ où $e_j = |c_j - \theta_j|$ si 
+$c_j, \theta_j \ne \mathrm{NA}$ et $e_j = \mathrm{NA}$ sinon, donne la
+distance entre un CI considéré et les préférences de l'utisateur sur chaque axe.
+On prend alors pour score d'ouverture :
 
 $$
-\operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le i \le d}{(\vec c - \vec\theta_t)^{\operatorname{abs}} \cdot \vec{o_i}}
+\operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le j \le d}{
+  d_j
+  \over
+  \displaystyle\prod_{\substack{j', 1 \le j' \le d \\ j' \ne j \\ d_{j'} \ne \mathrm{NA}}} d_{j'}
+}
 $$
 
-où $(\vec c - \vec\theta_t)^{\operatorname{abs}}$ est le vecteur ou chaque terme
-est la valeur absolue du vecteur d'origine, $\vec{o_i}$ vaut $-1$ sauf son
-i-ième élément qui vaut $1$. La valeur de 
-$(\vec c - \vec\theta_t) \cdot \vec{o_i}$ 
-augmente plus $\vec c$ est loin de $\vec \theta_t$ sur l'axe $i$ et
-plus il est proche sur tous les autres axes. On calcul cette valeur par rapport
-à chaque axe et on garde la plus grande.
+Ce score augmente plus une valeur sur l'un des axe est grande et toutes les
+autres petites.
 
 Les CI d'ouverture à l'instant $t$ sont donnés par la séquence des CI 
 $C^O_t = (c_i)_{1 \le i \le N}$ triés par 

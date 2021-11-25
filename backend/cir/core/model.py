@@ -85,7 +85,7 @@ class CiSet:
                 ids = ci_selection)
 
     def mean_axes(self) -> npt.NDArray[np.float64]:
-        mean: npt.NDArray[np.float64] = self.axes.mean(axis = 0)
+        mean: npt.NDArray[np.float64] = np.nanmean(self.axes, axis = 0) # type: ignore
         return mean
 
     def contains(self, ci_id: CiId) -> bool:
@@ -102,8 +102,13 @@ def approximate_preferences(ci_set: CiSet) -> Model:
 
 
 def prox(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
+    n_valid: npt.NDArray[np.float64] = \
+        np.sum(
+            ~np.isnan(ci_set.axes) & ~np.isnan(preferences.axes),
+            axis = 1)
     res: npt.NDArray[np.float64] = \
-        np.sqrt(np.sum((ci_set.axes - preferences.axes) ** 2, axis = 1))
+        np.nansum(np.abs(ci_set.axes - preferences.axes), axis = 1) \
+        / n_valid
     return res
 
 
@@ -111,10 +116,10 @@ def ouv(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
     (n_ci, n_axes) = ci_set.axes.shape
     abs_diff: npt.NDArray[np.float64] = np.abs(ci_set.axes - preferences.axes)
     res: npt.NDArray[np.float64] = np.zeros(n_ci)
-    for i in range(n_axes):
-        o_i = np.ones(n_axes)
-        o_i[i] = -1
-        res = np.array([res, np.sum(abs_diff * o_i, axis = 1)]).max(axis = 0)
+    for j in range(n_axes):
+        d_j = abs_diff[:, j]
+        prod_d_j_prim = 1 + np.nanmean(np.delete(abs_diff, j, axis = 1), axis=1)
+        res = np.nanmax(np.array([res, d_j / prod_d_j_prim]), axis = 0)
     return res
 
 

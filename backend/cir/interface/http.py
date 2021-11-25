@@ -4,6 +4,7 @@ from cir.interface.csv import ci_set_from_csv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, Any, Tuple, Dict
+import numpy as np
 
 app = FastAPI()
 
@@ -66,4 +67,5 @@ async def ci_scores(ci: int) -> Dict[int, Dict[str,float]]:
     return {ci_id.val:
              {"distance": score_distance[ci_id.val],
               "ouverture": score_ouv[ci_id.val]}
-           for ci_id in ci_set.ids if ci_id.val != ci}
+           for ci_id in ci_set.ids 
+           if ci_id.val != ci and ~np.isnan(score_ouv[ci_id.val]) and ~np.isnan(score_distance[ci_id.val])}
