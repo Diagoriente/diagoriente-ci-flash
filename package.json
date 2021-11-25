@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "rehype-react": "^7.0.3"
+  }
+}

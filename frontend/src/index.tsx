@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import VisuScores from "views/VisuScores/VisuScores";
 import Reco from "views/Reco/Reco";
+import Readme from "views/Readme/Readme";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,6 +16,7 @@ ReactDOM.render(
             <Route index element={<Reco />} />
             <Route path="Reco" element={<Reco />} />
             <Route path="VisuScores" element={<VisuScores />} />
+            <Route path="Readme" element={<Readme />} />
             <Route
               path="*"
               element={

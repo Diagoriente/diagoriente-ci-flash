@@ -22,6 +22,14 @@ const NavBar: React.FC = () => {
               Visualiser les scores
             </NavLink>
           </li>
+          <li>
+            <NavLink reloadDocument
+              className={({isActive}: {isActive: boolean}) => 
+                isActive ? "font-bold" : ""}
+              to="/Readme">
+              À propos
+            </NavLink>
+          </li>
         </ul>
       </nav>
   );

@@ -39,7 +39,6 @@ rapidement leurs centres d'intérêts qu'en énumérant les 154 disponibles.
 - La moyenne des coefficients des centres d'intérêts sélectionnés à un instant
   donné est une approximation des préférences de l'utilisateur.
 
-
 ## Formalisation de la méthode
 
 Les listes de CI proches, d'ouverture et éloignés présentées à l'utilisateurs
@@ -57,28 +56,44 @@ $\vec\theta = (\theta_{1}, \dots, \theta_{d})$, ou $d$ est le nombre d'axes
 et $\theta_{i}$ la position préférée par l'utilisateur sur l'axe $i$.
 
 L'utilisateur est amené à sélectionner successivement des centres d'intérêts, on
-note la séquence des centres d'intérêts sélectionnés par $(\vec c_t)_{1 <= t <= N}$
-où $N = 154$ est le nombre de CI.
+note la séquence des centres d'intérêts sélectionnés par 
+$(\vec c_t)_{1 <= t <= N}$ où $N = 154$ est le nombre de CI.
 
 Après chaque sélection, on approxime $\vec\theta$ par la moyenne des 
 CI sélectionnés jusque là :
-$$\vec\theta_t = \frac{\sum_{1 \le i \le t} \vec c_i}{t}.$$
+
+$$
+\vec\theta_t = \frac{\sum_{1 \le i \le t} \vec c_i}{t}.
+$$
 
 Pour recommander des centres d'intérêts proches ou éloignés des préférences d'un
 utilisateur, on utilise comme mesure de proximité entre un centre d'intérêt $c$
 et les préférences $\vec\theta_t$ la distance euclidienne :
-$$\operatorname{prox}(\vec c, \vec\theta_t) = || \vec c - \vec\theta_t ||.$$
+
+$$
+\operatorname{prox}(\vec c, \vec\theta_t) = || \vec c - \vec\theta_t ||.
+$$
 
 Les CI proches à l'instant $t$ sont donnés du plus proches au plus éloignés par
 la séquence des CI $C^P_t = (c_i)_{1 \le i \le N}$ triés par 
-$\operatorname{prox}(\vec c, \vec\theta_t)$ croissant. Les CI éloignés à l'instant $t$
-sont donnés par cette même séquence prise dans l'ordre inverse.
+$\operatorname{prox}(\vec c, \vec\theta_t)$ croissant. Les CI éloignés à 
+l'instant $t$ sont donnés par cette même séquence prise dans l'ordre inverse.
 
 Pour recommander des centres d'intérêts d'ouverture, proches des préférences de
 l'utilisateur sur tous les axes sauf un, on utilise la mesure
-$$\operatorname{ouv}(\vec c, \vec\theta_t) = 
-  \max_{1 \le i \le d}{(\vec c - \vec\theta_t)^{\operatorname{abs}} \cdot \vec{o_i}}$$
-où $(\vec c - \vec\theta_t)^{\operatorname{abs}}$ est le vecteur ou chaque terme est la valeur absolue du vecteur d'origine, $\vec{o_i}$ vaut $-1$ sauf son i-ième élément qui vaut $1$. La valeur de
-$(\vec c - \vec\theta_t) \cdot \vec{o_i}$ augmente plus $\vec c$ est loin de $\vec \theta_t$ sur l'axe $i$ et plus il est proche sur tous les autres axes. On calcul cette valeur par rapport à chaque axe et on garde la plus grande.
 
-Les CI d'ouverture à l'instant $t$ sont donnés par la séquence des CI $C^O_t = (c_i)_{1 \le i \le N}$ triés par $\operatorname{ouv}(\vec c, \vec\theta_t)$ décroissant.
+$$
+\operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le i \le d}{(\vec c - \vec\theta_t)^{\operatorname{abs}} \cdot \vec{o_i}}
+$$
+
+où $(\vec c - \vec\theta_t)^{\operatorname{abs}}$ est le vecteur ou chaque terme
+est la valeur absolue du vecteur d'origine, $\vec{o_i}$ vaut $-1$ sauf son
+i-ième élément qui vaut $1$. La valeur de 
+$(\vec c - \vec\theta_t) \cdot \vec{o_i}$ 
+augmente plus $\vec c$ est loin de $\vec \theta_t$ sur l'axe $i$ et
+plus il est proche sur tous les autres axes. On calcul cette valeur par rapport
+à chaque axe et on garde la plus grande.
+
+Les CI d'ouverture à l'instant $t$ sont donnés par la séquence des CI 
+$C^O_t = (c_i)_{1 \le i \le N}$ triés par 
+$\operatorname{ouv}(\vec c, \vec\theta_t)$ décroissant.

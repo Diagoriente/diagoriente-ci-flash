@@ -1,0 +1,36 @@
+<h1 id="recommandation-de-centres-dintérêts-aux-utilisateurs-de-diagoriente">Recommandation de centres d’intérêts aux utilisateurs de Diagoriente</h1>
+<h2 id="vue-densemble">Vue d’ensemble</h2>
+<p><strong>Contexte:</strong> Lors de son parcours sur Diagoriente, un utilisateur est amené à sélectionner ses centres d’intérêts (CI) parmis 154 disponibles pour lui présenter des métiers susceptibles de l’intéresser. Chaque CI est annoté sur 7 axes avec une valeur entre -10 et 10. Ces valeurs sont invisibles pour les utilisateurs mais sont utilisées pour faire des recommandations. Les axes sont:</p>
+<ul>
+<li>Affaire—Assistance</li>
+<li>Innovation—Règlementation</li>
+<li>Collectif—Individuel</li>
+<li>Liberté créative—Cadre</li>
+<li>Confort—Effort Physique</li>
+<li>Conceptuel—Concrêt</li>
+<li>Thématique/Environnement—Identité/Projet de vie</li>
+</ul>
+<p><strong>Objectif:</strong> permettre aux utilisateurs de Diagoriente de trouver plus rapidement leurs centres d’intérêts qu’en énumérant les 154 disponibles.</p>
+<p><strong>Proposition:</strong></p>
+<ol type="1">
+<li>On présente d’abord à un utilisateur un CI séléctionné aléatoirement et on lui demande si ce CI l’intéresse. Si non, on recommence avec un autre CI choisi aussi aléatoirement jusqu’à ce qu’il réponde oui.</li>
+<li>On présente ensuite 3 listes de CI en fonction de celui déjà sélectionné: une liste de CI proches, une liste de CI d’ouverture (proches sur tous les axes sauf un), une liste de CI éloignés. On lui demande de choisir un CI.</li>
+<li>Dès que l’utilisateur choisit un CI, on le mémorise et on met à jour les trois listes de CI en fonction de ceux précédemment choisis.</li>
+<li>L’utilisateur a la possibilité à tout moment de quitter le processus de choix des CI pour voir les métiers qui lui sont recommandés à partir des CI qu’il a séléctionnés jusque là.</li>
+</ol>
+<p><strong>Hypothèses:</strong></p>
+<ul>
+<li>Un utilisateur a une unique valeur préférée sur chaque axe.</li>
+<li>La moyenne des coefficients des centres d’intérêts sélectionnés à un instant donné est une approximation des préférences de l’utilisateur.</li>
+</ul>
+<h2 id="formalisation-de-la-méthode">Formalisation de la méthode</h2>
+<p>Les listes de CI proches, d’ouverture et éloignés présentées à l’utilisateurs sont constituées en fonction des préférences de l’utilisateurs, c’est-à-dire sa valeur préférée sur chaque axe. Ces préférences sont inconnues et la méthode vise à en construire une approximation à partir des CI que l’utilisateur sélectionne successivement. Il y a donc une boucle entre la construction de l’approximation et la suggestion de CI. Au fur et à mesure des sélections de CI par l’utilisateur, la méthode affine l’approximation de ses préférences, suggère de nouveaux CI et recommence.</p>
+<p>Les préférences d’un utilisateur sont représentées par un vecteur <span class="math inline"><em>θ⃗</em> = (<em>θ</em><sub>1</sub>, …, <em>θ</em><sub><em>d</em></sub>)</span>, ou <span class="math inline"><em>d</em></span> est le nombre d’axes (c’est-à-dire 7) et <span class="math inline"><em>θ</em><sub><em>i</em></sub></span> la position préférée par l’utilisateur sur l’axe <span class="math inline"><em>i</em></span>.</p>
+<p>L’utilisateur est amené à sélectionner successivement des centres d’intérêts, on note la séquence des centres d’intérêts sélectionnés par <span class="math inline">(<em>c⃗</em><sub><em>t</em></sub>)<sub>1 &lt;  = <em>t</em> &lt;  = <em>N</em></sub></span> où <span class="math inline"><em>N</em> = 154</span> est le nombre de CI.</p>
+<p>Après chaque sélection, on approxime <span class="math inline"><em>θ⃗</em></span> par la moyenne des CI sélectionnés jusque là : <br /><span class="math display">$$\vec\theta_t = \frac{\sum_{1 \le i \le t} \vec c_i}{t}.$$</span><br /></p>
+<p>Pour recommander des centres d’intérêts proches ou éloignés des préférences d’un utilisateur, on utilise comme mesure de proximité entre un centre d’intérêt <span class="math inline"><em>c</em></span> et les préférences <span class="math inline"><em>θ⃗</em><sub><em>t</em></sub></span> la distance euclidienne : <br /><span class="math display">prox (<em>c⃗</em>, <em>θ⃗</em><sub><em>t</em></sub>) = ||<em>c⃗</em> − <em>θ⃗</em><sub><em>t</em></sub>||.</span><br /></p>
+<p>Les CI proches à l’instant <span class="math inline"><em>t</em></span> sont donnés du plus proches au plus éloignés par la séquence des CI <span class="math inline"><em>C</em><sub><em>t</em></sub><sup><em>P</em></sup> = (<em>c</em><sub><em>i</em></sub>)<sub>1 ≤ <em>i</em> ≤ <em>N</em></sub></span> triés par <span class="math inline">prox (<em>c⃗</em>, <em>θ⃗</em><sub><em>t</em></sub>)</span> croissant. Les CI éloignés à l’instant <span class="math inline"><em>t</em></span> sont donnés par cette même séquence prise dans l’ordre inverse.</p>
+<p>Pour recommander des centres d’intérêts d’ouverture, proches des préférences de l’utilisateur sur tous les axes sauf un, on utilise la mesure</p>
+<p><br /><span class="math display">$$\operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le i \le d}{(\vec c - \vec\theta_t)^{\operatorname{abs}} \cdot \vec{o_i}}$$</span><br /></p>
+<p>où <span class="math inline">(<em>c⃗</em> − <em>θ⃗</em><sub><em>t</em></sub>)<sup>abs</sup></span> est le vecteur ou chaque terme est la valeur absolue du vecteur d’origine, <span class="math inline">$\vec{o_i}$</span> vaut <span class="math inline"> − 1</span> sauf son i-ième élément qui vaut <span class="math inline">1</span>. La valeur de <span class="math inline">$(\vec c - \vec\theta_t) \cdot \vec{o_i}$</span> augmente plus <span class="math inline"><em>c⃗</em></span> est loin de <span class="math inline"><em>θ⃗</em><sub><em>t</em></sub></span> sur l’axe <span class="math inline"><em>i</em></span> et plus il est proche sur tous les autres axes. On calcul cette valeur par rapport à chaque axe et on garde la plus grande.</p>
+<p>Les CI d’ouverture à l’instant <span class="math inline"><em>t</em></span> sont donnés par la séquence des CI <span class="math inline"><em>C</em><sub><em>t</em></sub><sup><em>O</em></sup> = (<em>c</em><sub><em>i</em></sub>)<sub>1 ≤ <em>i</em> ≤ <em>N</em></sub></span> triés par <span class="math inline">ouv (<em>c⃗</em>, <em>θ⃗</em><sub><em>t</em></sub>)</span> décroissant.</p>

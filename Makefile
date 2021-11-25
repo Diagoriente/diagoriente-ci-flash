@@ -20,7 +20,7 @@ rsync -irtptPl --delete --info=progress2 \
 endef
 
 .PHONY:dev-up
-dev-up:
+dev-up: pre-build
 	./dev-up.sh
 
 .PHONY:sync-ovh
@@ -29,15 +29,15 @@ sync-ovh:
 	@echo -n "Confirm ? [y/N] " && read ans && [ $${ans:-N} = y ] && $(rsync_ovh)
 
 .PHONY: docker-build
-docker-build:
+docker-build: pre-build
 	$(docker-compose) --env-file build
 
 .PHONY: docker-up
-docker-up:
+docker-up: pre-build
 	$(docker-compose) --env-file .env-docker-local up --build -d
 
 .PHONY: deploy
-deploy: sync-ovh .env-deploy
+deploy: sync-ovh .env-deploy pre-build
 	rsync -rtptPl .env-deploy ovh-vps-test:Diagoriente/.env-deploy
 	ssh ovh-vps-test bash -c "'cd Diagoriente \
 		&& $(docker-compose) --env-file .env-deploy up --build -d'"
@@ -46,5 +46,11 @@ deploy: sync-ovh .env-deploy
 docker-down:
 	$(docker-compose) down
 
+.PHONY: pre-build
+pre-build: static/Readme.md ;
+
 Readme.html: Readme.md
 	pandoc --toc --standalone --mathjax=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js -f markdown -t html Readme.md -o Readme.html
+
+static/Readme.md: Readme.md
+	cp $< $@

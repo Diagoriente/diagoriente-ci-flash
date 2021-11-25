@@ -16,4 +16,5 @@ const checkIsDefined = (envVarName: string): string => {
 }
 
 export const BACKEND_URL: URL = new URL(checkIsDefined("REACT_APP_BACKEND_URL"));
+export const STATIC_URL: URL = new URL(checkIsDefined("REACT_APP_STATIC_URL"));
 

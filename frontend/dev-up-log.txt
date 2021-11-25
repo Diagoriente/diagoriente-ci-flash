@@ -1,0 +1,28 @@
+[1]  18030 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18031 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18032 Running                 npm start &
+Waiting for all background jobs
+[1]  18092 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18093 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18094 Running                 npm start &
+Waiting for all background jobs
+[1]  18398 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18399 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18400 Running                 npm start &
+Waiting for all background jobs
+[1]  18519 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18520 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18521 Running                 npm start &
+Waiting for all background jobs
+[1]  18591 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18592 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18593 Running                 npm start &
+Waiting for all background jobs
+[1]  18741 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18742 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18743 Running                 npm start &
+Waiting for all background jobs
+[1]  18900 Running                 python3 -m http.server --directory static 8001 &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[2]- 18901 Running                 uvicorn cir.interface.http:app --reload &  (wd: ~/Work/Missions/2021/Diagoriente/Dev)
+[3]+ 18902 Running                 npm start &
+Waiting for all background jobs

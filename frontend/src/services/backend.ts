@@ -3,14 +3,15 @@ import {ci} from 'utils/helpers/Ci';
 import {ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {ciReco} from 'utils/helpers/CiReco';
 import {ciScoresFromRecord} from 'utils/helpers/CiScores';
-import {BACKEND_URL} from 'utils/constants'
+import {BACKEND_URL} from 'utils/constants';
+import {NetworkError, throwNetworkError, HttpError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
 
 export async function fetchCiNames(): Promise<CiNames> {
   const req = new URL(BACKEND_URL + "ci_names")
   const errorMsg =  "Could not fetch CI names.";
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
-    .then(resultOrThrowHttpError<Record<number, string>>(req, errorMsg))
+    .then(jsonOrThrowHttpError<Record<number, string>>(req, errorMsg))
     .then(r => ciNamesFromRecord(r)));
 }
 
@@ -20,7 +21,7 @@ export async function fetchCiRandom(n: number): Promise<Ci[]> {
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
-    .then(resultOrThrowHttpError<number[]>(req, errorMsg))
+    .then(jsonOrThrowHttpError<number[]>(req, errorMsg))
     .then(r => r.map(ci)));
 }
 
@@ -41,7 +42,7 @@ export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> 
       headers: {'Content-Type': 'application/json;charset=utf-8'},
       body: JSON.stringify(selectedCi.map(ci => ci.id.toString()))
   }).catch(throwNetworkError(req, errorMsg))
-    .then(resultOrThrowHttpError<CiRecoResponse>(req, errorMsg))
+    .then(jsonOrThrowHttpError<CiRecoResponse>(req, errorMsg))
     .then((r: CiRecoResponse) =>
         ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))));
 }
@@ -53,39 +54,6 @@ export async function fetchCiScores(ci: Ci): Promise<CiScores> {
   const errorMsg =  "Could not fetch CI scores.";
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
-    .then(resultOrThrowHttpError<CiScores>(req, errorMsg))
+    .then(jsonOrThrowHttpError<CiScores>(req, errorMsg))
     .then(r => ciScoresFromRecord(r)));
 }
-
-class NetworkError extends Error {
-  constructor(url: URL, message: string, cause: Error) {
-    super(message + " Unable to reach '" + url.toString() + "' Cause: " + cause.toString())
-    this.name = "NetworkError"
-  }
-}
-
-
-const throwNetworkError = (url: URL, msg: string) => (cause: Error) => {
-  if (cause instanceof TypeError) {
-    throw new NetworkError(url, msg, cause);
-  } else throw cause;
-};
-
-
-class HttpError extends Error {
-  constructor(url: URL, httpResponse: Response, message: string) {
-    super(message + " Requested resource: '" + url + "' Status " + httpResponse.status + " Headers: " +
-      JSON.stringify(Array.from(httpResponse.headers)));
-    this.name = "HttpError";
-  }
-};
-
-
-const resultOrThrowHttpError = <T> (url: URL, msg: string) => 
-    (response: Response): Promise<T> => {
-  if (response.ok) {
-    return response.json()
-  } else {
-    throw new HttpError(url, response, msg)
-  }
-};
