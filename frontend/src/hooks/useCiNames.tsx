@@ -1,6 +1,5 @@
 import {useState, useEffect} from 'react';
-import {CiNames} from 'types/types'
-import {ciNamesFromRecord} from 'utils/helpers/CiNames';
+import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {fetchCiNames} from 'services/backend';
 
 

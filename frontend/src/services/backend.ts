@@ -1,8 +1,7 @@
-import {Ci, CiNames, CiReco, CiScores} from 'types/types';
-import {ci} from 'utils/helpers/Ci';
-import {ciNamesFromRecord} from 'utils/helpers/CiNames';
-import {ciReco} from 'utils/helpers/CiReco';
-import {ciScoresFromRecord} from 'utils/helpers/CiScores';
+import {Ci, ci} from 'utils/helpers/Ci';
+import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
+import {CiReco, ciReco} from 'utils/helpers/CiReco';
+import {CiScores, ciScoresFromRecord} from 'utils/helpers/CiScores';
 import {BACKEND_URL} from 'utils/constants';
 import {NetworkError, throwNetworkError, HttpError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
 

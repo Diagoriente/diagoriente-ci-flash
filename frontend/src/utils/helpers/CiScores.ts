@@ -1,5 +1,17 @@
-import {Ci, CiScores, CiScoreVals, CiNames} from "types/types";
-import {ci} from 'utils/helpers/Ci';
+import {Ci,  ci} from 'utils/helpers/Ci';
+import {CiNames} from 'utils/helpers/CiNames';
+
+
+export type CiScoreVals = {distance: number; ouverture: number};
+
+
+export type CiScores = {
+  map: Record<number, CiScoreVals>;
+  get: (ci: Ci) => CiScoreVals;
+  distanceAsc: (ciNames: CiNames) => {name: string, val: number}[];
+  ouvertureDesc: (ciNames: CiNames) => {name: string, val: number}[];
+};
+
 
 export const ciScoresFromRecord = (rec: Record<number, CiScoreVals>): CiScores => {
   return {

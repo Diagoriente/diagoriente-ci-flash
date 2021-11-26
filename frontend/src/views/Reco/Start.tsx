@@ -1,4 +1,5 @@
-import {Ci, CiNames} from "types/types";
+import {Ci} from "utils/helpers/Ci";
+import {CiNames} from "utils/helpers/CiNames";
 import React, {useState, useEffect} from 'react';
 import {fetchCiRandom} from 'services/backend';
 

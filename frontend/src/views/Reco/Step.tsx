@@ -1,5 +1,6 @@
-import {Ci, CiNames, CiReco} from "types/types";
-import {ciReco} from "utils/helpers/CiReco";
+import {Ci} from "utils/helpers/Ci";
+import {CiNames} from "utils/helpers/CiNames";
+import {CiReco, ciReco} from "utils/helpers/CiReco";
 import React, {useState, useEffect} from 'react';
 import {NavLink} from 'react-router-dom';
 import {fetchCiRandom, fetchCiReco} from 'services/backend';
@@ -24,24 +25,21 @@ const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
             setCiRecoState(cir);
           }
         });
+    } else {
+      fetchCiReco(nReco, selectedCis)
+        .then(res => {
+          setCiRecoState(res)
+        });
     }
- 
-    fetchCiReco(nReco, selectedCis)
-      .then(res => {
-        setCiRecoState(res)
-      });
   }, [selectedCis, nReco]);
 
   if (ciRecoState === undefined) {
-
     return (
       <div>
         <p>Chargement…</p>
       </div>
     );
-
   } else {
-
     const mapCisToElements = (cis: Ci[]): JSX.Element[]  => {
       return cis.map(ci => {
         return (

@@ -1,5 +1,12 @@
-import {Ci, CiNames} from 'types/types';
-import {ci} from 'utils/helpers/Ci';
+import {Ci, ci} from 'utils/helpers/Ci';
+
+
+export type CiNames = {
+  map: Record<number, string>;
+  get: (ci: Ci) => string;
+  array: () => {ci: Ci, name: string}[];
+}
+
 
 export const ciNamesFromRecord = (rec: Record<number, string>): CiNames => {
   return {
