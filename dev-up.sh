@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo > dev-up-log.txt
-
 set -a
 . .env
 set +a
@@ -14,11 +12,10 @@ export REACT_APP_BACKEND_URL=$BACKEND_URL
 export REACT_APP_STATIC_URL=$STATIC_URL
 
 # Start a local static file server
-./simple-cors-http-server.py 8001 &
+./simple-cors-http-server.py 8001 2>&1 > log/static-server.log &
 
 # Start the backend
-echo "Starting uvicorn" >> dev-up-log.txt
-uvicorn cir.interface.http:app --reload &
+uvicorn cir.interface.http:app --reload 2>&1 > log/uvicorn.log &
 
 # Start the frontend
 cd frontend
