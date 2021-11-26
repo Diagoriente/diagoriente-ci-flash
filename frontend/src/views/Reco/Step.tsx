@@ -1,7 +1,8 @@
 import {Ci, CiNames, CiReco} from "types/types";
+import {ciReco} from "utils/helpers/CiReco";
 import React, {useState, useEffect} from 'react';
 import {NavLink} from 'react-router-dom';
-import {fetchCiReco} from 'services/backend';
+import {fetchCiRandom, fetchCiReco} from 'services/backend';
 
 
 const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
@@ -10,10 +11,23 @@ const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
   const [ciRecoState, setCiRecoState] = useState<CiReco | undefined>(undefined);
 
   useEffect(() => {
-    console.log(`Fetching ci reco: ${JSON.stringify(selectedCis)}`);
+    if (selectedCis.length === 0) {
+      fetchCiRandom(nReco * 3)
+        .then(cis => {
+          if (cis.length === 0) {
+            console.error("Received 0 random CI from backend.");
+          } else {
+              const cir = ciReco(
+                cis.slice(0,nReco), 
+                cis.slice(nReco,nReco * 2), 
+                cis.slice(nReco * 2, nReco * 3));
+            setCiRecoState(cir);
+          }
+        });
+    }
+ 
     fetchCiReco(nReco, selectedCis)
       .then(res => {
-        console.log(`Setting siRecoState to ${JSON.stringify(res)}`);
         setCiRecoState(res)
       });
   }, [selectedCis, nReco]);
@@ -42,15 +56,28 @@ const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
     const ciOpening = mapCisToElements(ciRecoState.ciOpening);
     const ciDistant = mapCisToElements(ciRecoState.ciDistant);
 
-    return (
-      <div className="space-y-5">
-        <p>Choisissez un autre centre d'intérêt (ou 
+    let prompt;
+    if (selectedCis.length === 0) {
+      prompt = <p className="text-center">Choisissez un centre d'intérêt (ou 
+          <NavLink reloadDocument
+            style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
+            to="/Reco">
+             remélangez
+          </NavLink>
+        )</p>
+    } else {
+      prompt = <p className="text-center">Choisissez un autre centre d'intérêt (ou 
           <NavLink reloadDocument
             style={({isActive}: {isActive: boolean}) => {return {fontWeight: isActive ? "bold" : "normal"}}}
             to="/Reco">
              recommencez
           </NavLink>
         )</p>
+    }
+
+    return (
+      <div className="space-y-5">
+        {prompt}
         <div className="flex space-x-5">
           <div className="w-1/3 space-y-4">
             <p className="text-center">(proches)</p>

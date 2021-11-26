@@ -28,8 +28,6 @@ export const Reco: React.FC = () => {
     <div className="flex space-x-20 items-start">
       <div className="w-4/6">
         {
-          selectedCis.length === 0 ?
-            <Start onYes={addCi} ciNames={ciNames}/> :
             <Step 
               onSelectCi={addCi}
               selectedCis={selectedCis}
