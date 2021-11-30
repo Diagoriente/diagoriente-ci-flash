@@ -1,0 +1,158 @@
+CI,Factor1,Factor2
+Travailler à mon compte,-0.393927289730466,0.33273685121584
+Travailler seul,-0.601883349938733,-0.137105697674195
+"Piloter les coûts, la rentabilité",0.780019480739296,-1.43048692782168
+Piloter un budget,1.10245413959321,0.308233241801614
+Gérer un service de grande entreprise,0.837383594266601,-0.688098006247765
+Gérer une salle de sport,-0.493910836567101,1.34707831172769
+Gérer un hôtel,-0.303047357800582,1.24009913743953
+Gérer un salon de coiffure,-0.253554514142302,1.2159665498408
+Créer un projet entrepreneurial,-1.73116438068973,-0.126911356445687
+Prendre des risques,-1.92921767651109,2.27311021941466
+Vendre ou louer des maisons,0.243141575703896,0.38956457849606
+"Gérer des actifs, un patrimoine",0.965985010754824,-1.71151078723676
+Piloter des indicateurs statistiques,-0.0880843678378575,-2.32599594699058
+"Etre leader, inspirer et motiver",-2.04147324006486,0.0280684389167959
+"Organiser une équipe, des tâches",0.298664267880877,0.360422827958434
+"Coacher, faire progresser les autres",-0.65978665993048,-0.871048418141455
+Atteindre des objectifs ambitieux,-1.78717713738914,0.478356063063245
+Accompagner le changement,-1.02905893305016,-0.494766543955693
+Réaliser une veille de marché,-0.58637543170669,-1.30235540520196
+Concevoir une offre de produits / services,-1.11125391175374,-0.461546617111635
+Travailler dans l’administration publique,1.10593659610165,-1.0173135170527
+Donner des discours,-1.98726063011204,-0.379027245209141
+Développer un territoire économique,-0.151495298225491,0.00776832100615543
+"Gérer et entretenir un site, une infrastructure",0.662084380074202,0.176345698548036
+"Se déplacer souvent, voyager",-0.55985614862985,1.37875884229951
+"Convaincre, influencer",-1.00070641861429,-0.509090710367544
+"Concevoir des contenus, des supports de communication",-1.69561601331838,-1.12043751663876
+Gérer le marketing et piloter l'image de marque,-2.11737636020035,-1.0924377629268
+"Vendre, commercialiser",-0.752033347324893,0.898257994680475
+Servir un client,-0.181378584388869,0.776982470335028
+Elaborer une stratégie commerciale,-1.1654969957362,-0.814551736391101
+Elaborer une offre commerciale / Répondre à un appel d'offre,-0.327529024534332,-1.63284266846713
+Gérer la relation client,-0.119096734112921,0.373838863051749
+"Améliorer la qualité de service, fidéliser les clients",-0.9178780464094,-0.943163541413407
+Animer la communication interne,-1.12320005832075,0.683507715228492
+"Accueillir, orienter, renseigner",1.03061551385718,-0.610653548306399
+S'occuper de la carrière de quelqu'un,-0.503912182311981,0.959326962853475
+Ecouter et dialoguer avec ses collaborateurs,0.0869048885388555,0.0684876848061992
+Maintenir l’engagement et la satisfaction des collaborateurs,-0.0492575985602621,0.141104102863526
+Travailler en réseau,0.0399712595466294,0.295199143738702
+Découvrir d'autres cultures,-2.2365175519962,0.131291178976269
+Travailler en collectif,-0.282625945114944,-0.883553226341421
+Travailler dans le secteur social,1.23244752850989,0.256604866617683
+Travailler dans un bureau,0.129573615047122,-0.532072135754962
+Assurer une gestion documentaire,2.16683209440616,-0.620464506857073
+Faire des inventaires et tenir des registres,2.14105919742151,-0.035516839384019
+Commander et gérer le matériel de bureaux,1.74633830742632,-0.399318380841352
+Gérer la logistique,1.04958655068093,0.927658516113918
+Tenir le registre des transactions financières d'une entreprise,2.22977018928628,0.116472644156261
+Assurer la gestion administrative,1.7139704517549,0.373521799981583
+Calculer le salaire des employés,2.12566122603199,-0.978814552986868
+Transférer des fonds entre banques,1.60850966816968,0.645231858554798
+Elaborer et faire respecter des consignes,1.18524806473394,0.0900850238417134
+Respecter les règles,1.8740289881189,0.11390128609444
+Collecter et classer,1.011629092304,0.570808630344032
+Gérer la comptabilité et les finances,1.91804034060333,-1.0591313336188
+Gérer les finances publiques,1.92755414673201,-0.875349940522097
+Protéger les personnes et les biens,1.51132683049823,0.317517708387027
+Juger,1.99160992559308,-1.47518960418593
+Faire respecter les lois,1.34491403937856,0.40659253589357
+Participer à des procès,1.50667514232873,-1.21901572135352
+Enquêter,-0.256035747237944,0.64459244061586
+Rédiger des contrats,1.86658495689381,-1.41733806983642
+Négocier des contrats,0.778589106616483,-1.2323202850411
+Respecter un cadre juridique,1.57394928718149,0.0844837411753692
+Assurer un transport,1.20864341326746,0.85426336151844
+Travailler sur des voitures,-0.359127305973241,1.66166605749425
+"Réparer, nettoyer, entretenir",0.529818606393457,1.20252247614508
+Poser du parquet ou du carrelage,-0.610535036959686,1.78982414735695
+Poser des murs ou des toits,0.336035107591382,1.30725559584497
+"Poser, réparer de la plomberie",0.794318282859313,1.07269588827564
+"Livrer, transporter, conduire, manoeuvrer",1.36490722929581,0.781471246930252
+Porter ou manipuler des charges lourdes,0.524602989403469,1.20841449735964
+"Faire un travail physique, fatiguant",-0.526743831116535,1.74618669048395
+Réparer et installer des serrures,1.38519007709389,0.763303191334516
+Se rendre sur des chantiers,0.187350938177792,0.619133959618434
+Manipuler des matières premières,0.827507493248934,0.861433793077939
+"Extraire, exploiter des ressources",-0.101191213659522,0.0031616524700741
+"Conditionner, manutentionner des produits",0.39749900473469,1.27302559931646
+Réparer des appareils électroménagers,0.130436985828872,1.41015229055585
+Monter des meubles,-0.700163812663962,0.30547937464012
+Maîtriser un savoir faire technique,-0.227956012837014,1.20970646878219
+Utiliser une machine sur une chaîne de production,1.53111159517866,0.689007167732532
+Assembler des pièces électroniques,0.162735582027675,1.19726653545654
+Assurer la maintenance technique,1.41041512694789,0.752833973906796
+"Cultiver, récolter",0.641330494122224,0.769624818156272
+Cuisiner,-0.297078019176392,1.63035914601087
+Travailler dans l'art ou dans la musique,-2.30466883815573,-0.7823607622659
+"Faire des tâches minutieuses, de précision",-0.00991725830885062,1.08717247602407
+"Utiliser des machines, des outils, des logiciels",-0.445149351762075,0.350778948665234
+"Repérer les erreurs, observer, contrôler",1.1859966883476,0.486974287971823
+Maîtriser une documentation technique,1.34698366177914,0.199613431801926
+Contrôler la qualité,1.15334818799194,0.867613502832334
+Gérer les stocks et les approvisionnements,1.08048939642813,0.33626293954343
+Travailler de mes mains,-0.632050990206064,0.27202576863293
+"Construire, fabriquer",-0.309433932373669,1.63669276182794
+Entretenir des jardins et des espaces verts,-1.11906286202372,2.04918834630378
+Aménager un espace,-1.54481354935121,-0.422445866362925
+Dessiner,-1.24039430952576,-1.54194500938982
+Ecrire des chansons,-1.3722024631864,-1.67003267019875
+"Composer, mettre en scène",-1.9146512064506,-1.00365131284991
+"Créer une oeuvre, designer",-1.95374529127746,-0.602032336333136
+"Faire des illustrations, du graphisme",-1.57016860126086,-0.802435582132422
+Ecrire des scénarios de films ou séries,-1.33158987089857,-1.69030846143603
+"Distraire, animer, divertir",-1.93664932016997,-0.212124110441407
+"Chanter, jouer d'un instrument",-1.34014413901602,0.815946297912118
+Exercer une activité artistique ou créative,-1.62063646209026,-0.000262999123353524
+Travailler dans le spectacle ou pour la télévision,-1.08017411400589,-0.25833629709817
+"Réaliser une performance, une représentation artistique",-1.56312170593436,0.743867955215769
+Diriger une pièce de théâtre,-1.82103055628191,0.106463741598775
+Se déplacer pour faire des reportages,-0.923641625075801,1.18393868797765
+Avoir des sensations fortes,-1.75233382321303,2.37101093774811
+Jouer un rôle dans une série ou un film,-0.486865078088772,0.19295643956183
+Ecrire des livres,-1.2864905860095,-1.14227990839255
+Traduire,0.861344412122292,0.809552946984368
+Développer les relations internationales,-1.06786974028295,-0.280637775997896
+Pratiquer plusieurs langues,-1.42154206195247,-1.25644002357437
+Se déplacer en tournées,-0.650840598602688,1.04218011085561
+Organiser des sorties pédagogiques avec des personnes handicapées,1.11916642358212,0.324949822722296
+Apprendre à des personnes handicapées à travailler en autonomie,1.07464193153779,0.916461870879799
+Favoriser l'insertion professionnelle et sociale des personnes,0.867590360615011,0.0598789678442204
+Enseigner et éduquer,0.630548837017256,-0.200376887047771
+Enseigner dans une école primaire,0.985601729396447,0.000518901231602738
+Enseigner à une classe de lycée,0.53320277923888,-1.29553132448859
+"Aider, conseiller les autres",0.29629414906813,0.344594195204726
+M'occuper de la santé des autres,0.871030488068819,1.02647194191595
+Travailler pour des associations,-0.0894046529253601,0.366841259667998
+Réaliser un accompagnement psychologique,1.07450947972154,-1.00219394732038
+Apprendre la lecture à des enfants,1.13283791923471,-0.0840022890861532
+S'occuper des enfants dans une garderie,0.229903120164343,0.96882933187414
+Être avec des enfants ou adolescents,0.57161134745326,0.608585383905677
+Travailler en magasin,-0.0830068378904279,1.1284474067218
+Travailler au domicile d'un particulier,0.750536163983746,0.70175574454943
+Aider les personnes ayant des problèmes familiaux,1.34016545265893,0.403313285162778
+Aider les personnes ayant des problèmes d'addiction,1.01104955742693,0.959925988189641
+Prendre soin des animaux,0.708059469253565,0.727028247239175
+Protéger l'environnement,-0.0483544769374622,1.11427446643421
+Être dans la nature,-0.493207303537556,0.961286853308498
+Etudier le comportement animal,-1.15295438319288,-1.77424535519852
+Cartographier,0.586835577126688,-1.31830887223008
+Etudier des solutions pour réduire la pollution,-0.502504140323902,0.369765864968857
+Faire de la recherche scientifique,-0.422837881807339,-2.15761913521986
+Examiner au microscope,-1.03821059823574,-1.62669012296426
+"Gérer une architechture logicielle, un système technique",1.41048674868457,-2.13874705615797
+Rechercher et analyser des informations,-0.883126460445393,-1.1446319699791
+"Travailler avec les nombres, manipuler des données",-0.41239485775118,-0.829073399594244
+Etudier la génétique,-0.603061014589831,-2.06814065897389
+Etudier la structure du corps humain,-0.603061014589831,-2.06814065897389
+Développer des nouveaux traitements médicaux,-0.330467709850953,-2.20859745398471
+Etudier le mouvement des planètes,-0.603061014589831,-2.06814065897389
+"Faire des expériences, des tests",-0.45479005622251,-2.14414404877879
+Développer des programmes informatiques,1.20982533018973,-0.892271241467428
+Résoudre des énigmes et des problèmes,-0.972613235433352,-0.332232508589588
+Elaborer une feuille de calcul à l'aide d'un logiciel,0.715652097000173,0.307285407928759
+Modéliser / Prototyper,-1.47345047615277,-0.848561421690102
+Utiliser les nouvelles technologies,-0.192020500077887,-0.158697845119494
+Assurer une veille technologique,-1.6489757363306,-0.940150181954258

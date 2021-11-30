@@ -9,3 +9,8 @@ export const graphType = (name: string | null): GraphType | null => {
       return null;
   }
 };
+
+export const graphTypeFromString = (s: string | null): GraphType | null =>
+  graphType(s);
+
+export const graphTypeToString = (g: GraphType): string => g.toString();

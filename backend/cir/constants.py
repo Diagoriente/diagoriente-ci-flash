@@ -14,5 +14,5 @@ try:
     RNGSEED: Optional[int] = int(getenv_checked("RNGSEED"))
 except:
     RNGSEED = None
-COEFDATAFILE: Path = Path(getenv_checked("COEFDATAFILE"))
+COEFDATAFOLDER: Path = Path(getenv_checked("COEFDATAFOLDER"))
 FRONTEND_URL = getenv_checked("FRONTEND_URL")

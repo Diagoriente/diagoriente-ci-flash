@@ -12,7 +12,7 @@ def test_approximate_preferences() -> None:
     result = approximate_preferences(ci_set)
     expected = np.array([1,1,1,0,-1,1,np.nan])
 
-    assert np.all((expected - result.axes)[:6] < 0.0000001)
+    assert np.all(expected[:6] - result.axes[:6] < 0.0000001)
     assert np.all(np.isnan(result.axes[6]))
 
 

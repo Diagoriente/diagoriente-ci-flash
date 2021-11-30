@@ -1,45 +1,48 @@
-import {Ci, ci, ciFromString} from "utils/helpers/Ci";
+import {ci, ciFromString, ciToString} from "utils/helpers/Ci";
 import {CiScores} from "utils/helpers/CiScores";
-import {GraphType, graphType} from "utils/helpers/GraphType";
+import {GraphType, graphTypeFromString, graphTypeToString} from "utils/helpers/GraphType";
 import useCiNames from "hooks/useCiNames";
+import useDataVersions from 'hooks/useDataVersions';
 import useStateSP from "hooks/useStateSP";
 import {fetchCiScores} from "services/backend";
 import React, {useState, useEffect} from 'react';
 import * as d3 from 'd3';
 import HorizontalBarChart from "views/VisuScores/HorizontalBarChart";
-import {useSearchParams} from 'react-router-dom';
+import useDataVersion from 'hooks/useDataVersion';
 
 const VisuScores: React.FC = () => {
 
-  const [curGraphType, setCurGraphType] = useStateSP(
-    "distance" as GraphType,
-    "graphType",
-    (s: string | null): GraphType | null => graphType(s),
-    (g: GraphType): string => g.toString()
-  )
+  const [curGraphType, setCurGraphType] = useStateSP("distance" as GraphType,
+    "graphType", graphTypeFromString, graphTypeToString);
 
-  const [curCi, setCurCi] = useStateSP(
-    ci(0),
-    "ci",
-    (s: string | null): Ci | null => s === null ? null : ciFromString(s),
-    (c: Ci): string => c.id.toString()
-  );
+  const [curCi, setCurCi] = useStateSP(ci(0), "ci", ciFromString, ciToString);
 
   const [ciDist, setCiDist] = useState<{name: string, val: number}[]>([]);
   const [ciOuv, setCiOuv] = useState<{name: string, val: number}[]>([]);
-  const ciNames = useCiNames();
+  const dataVersions = useDataVersions();
+  const [dataVersion, setDataVersion] = useDataVersion(undefined);
+  const ciNames = useCiNames(dataVersion);
 
   useEffect(() => {
-    if (curCi !== null) {
-      fetchCiScores(curCi).then((ciScores: CiScores): void => {
+    if (dataVersions !== undefined) {
+      if (dataVersions.find((item) => item === dataVersion) === undefined) {
+        setDataVersion(dataVersions[0]);
+      }
+    }
+  }, [dataVersions, dataVersion, setDataVersion]);
+
+
+  useEffect(() => {
+    if (curCi !== null && dataVersion !== undefined && ciNames !== undefined) {
+      fetchCiScores(dataVersion, curCi).then((ciScores: CiScores): void => {
         setCiDist(ciScores.distanceAsc(ciNames));
         setCiOuv(ciScores.ouvertureDesc(ciNames));
       });
     }
-  }, [curCi, ciNames]);
+  }, [curCi, ciNames, dataVersion]);
 
   useEffect(() => {
-    if (curCi !== null && curGraphType !== null) {
+    if (curCi !== null && curGraphType !== null && ciNames !== undefined) {
       let xLabel;
       let yDomain;
       let data;
@@ -81,14 +84,30 @@ const VisuScores: React.FC = () => {
     }
   }, [curGraphType, curCi, ciDist, ciOuv, ciNames]);
 
-  if (curCi === null) {
-    return (<p>Error in url search parameter curCi</p>)
-  } else if (curGraphType === null) {
-    return (<p>Error in url search parameter curCi</p>)
+  if (ciNames === undefined) {
+    return <p>Loading…</p>;
   } else {
     return (
       <div className="flex-col space-y-5">
-        <div className="text-center">
+        <div className="text-left">
+          <label className="inline" htmlFor="vis-score-data-version">Coefficients utilisés :</label>
+          <select 
+            className="rounded bg-indigo-200"
+            name="vis-score-data-version"
+            id="vis-score-data-version"
+            defaultValue={dataVersion || dataVersions[0]}
+            onChange={e => setDataVersion(e.target.value)}
+          >
+            {
+              dataVersions.map((version) => 
+                <option key={version} value={version}>
+                  {version}
+                </option>
+              )
+            }
+          </select>
+        </div>
+        <div className="text-left">
           <label htmlFor="vis-score-graph-type">Visualiser</label>
           <select 
             className="rounded bg-indigo-200"

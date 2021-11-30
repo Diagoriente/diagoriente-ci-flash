@@ -3,10 +3,19 @@ import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {CiReco, ciReco} from 'utils/helpers/CiReco';
 import {CiScores, ciScoresFromRecord} from 'utils/helpers/CiScores';
 import {BACKEND_URL} from 'utils/constants';
-import {NetworkError, throwNetworkError, HttpError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
+import {throwNetworkError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
 
-export async function fetchCiNames(): Promise<CiNames> {
+export async function fetchDataVersions(): Promise<string[]> {
+  const req = new URL(BACKEND_URL + "data_versions")
+  const errorMsg =  "Could not fetch data versions.";
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<string[]>(req, errorMsg)));
+}
+
+export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
   const req = new URL(BACKEND_URL + "ci_names")
+  req.searchParams.set("data_version", dataVersion);
   const errorMsg =  "Could not fetch CI names.";
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
@@ -14,8 +23,9 @@ export async function fetchCiNames(): Promise<CiNames> {
     .then(r => ciNamesFromRecord(r)));
 }
 
-export async function fetchCiRandom(n: number): Promise<Ci[]> {
+export async function fetchCiRandom(dataVersion: string, n: number): Promise<Ci[]> {
   const req = new URL(BACKEND_URL + "ci_random")
+  req.searchParams.set("data_version", dataVersion);
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
   return (fetch(req.toString())
@@ -25,8 +35,9 @@ export async function fetchCiRandom(n: number): Promise<Ci[]> {
 }
 
 
-export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> {
+export async function fetchCiReco(dataVersion: string, n: number, selectedCi: Ci[]): Promise<CiReco> {
   const req = new URL(BACKEND_URL + "ci_recommend")
+  req.searchParams.set("data_version", dataVersion);
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
 
@@ -47,8 +58,9 @@ export async function fetchCiReco(n: number, selectedCi: Ci[]): Promise<CiReco> 
 }
 
 
-export async function fetchCiScores(ci: Ci): Promise<CiScores> {
+export async function fetchCiScores(dataVersion: string, ci: Ci): Promise<CiScores> {
   const req = new URL(BACKEND_URL + "ci_scores")
+  req.searchParams.set("data_version", dataVersion);
   req.searchParams.set("ci", ci.id.toString());
   const errorMsg =  "Could not fetch CI scores.";
   return (fetch(req.toString())

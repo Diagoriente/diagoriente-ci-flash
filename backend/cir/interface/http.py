@@ -1,14 +1,12 @@
 from cir import constants
 from cir.core import model
-from cir.interface.csv import ci_set_from_csv
+from cir.interface.csv import ci_set_from_csv, ci_set_collection
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, Any, Tuple, Dict
 import numpy as np
 
 app = FastAPI()
-
-ci_names, ci_set = ci_set_from_csv(constants.COEFDATAFILE)
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,19 +16,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def pass_ci_id_or_raise(i: int, msg: str) -> None:
+def pass_ci_id_or_raise(data_version: str, i: int, msg: str) -> None:
+    _, ci_set = ci_set_collection[data_version]
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
 
 
+@app.get("/data_versions")
+async def get_data_versions() -> list[str]:
+    return sorted(list(ci_set_collection.keys()))
+
+
 @app.get("/ci_names")
-async def get_ci_names() -> dict[int, str]:
+async def get_ci_names(data_version: str) -> dict[int, str]:
+    print("AAAAA" + data_version)
+    ci_names, _ = ci_set_collection[data_version]
     return dict(enumerate(ci_names))
 
 
 @app.get("/ci_random")
-async def ci_random(n: int) -> list[int]:
-    pass_ci_id_or_raise(n,
+async def ci_random(data_version: str, n: int) -> list[int]:
+    _, ci_set = ci_set_collection[data_version]
+    pass_ci_id_or_raise(data_version, n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
     cis = [x.val for x in model.ci_random(n, ci_set).ids]
@@ -38,8 +45,9 @@ async def ci_random(n: int) -> list[int]:
 
 
 @app.post("/ci_recommend")
-async def ci_recommend(n: int, selected_cis: list[int]) -> Dict[str, list[int]]:
-    pass_ci_id_or_raise(n,
+async def ci_recommend(data_version: str, n: int, selected_cis: list[int]) -> Dict[str, list[int]]:
+    _, ci_set = ci_set_collection[data_version]
+    pass_ci_id_or_raise(data_version, n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
 
@@ -60,7 +68,8 @@ async def ci_recommend(n: int, selected_cis: list[int]) -> Dict[str, list[int]]:
     }
 
 @app.get("/ci_scores")
-async def ci_scores(ci: int) -> Dict[int, Dict[str,float]]:
+async def ci_scores(data_version: str, ci: int) -> Dict[int, Dict[str,float]]:
+    _, ci_set = ci_set_collection[data_version]
     pref = model.approximate_preferences(ci_set.select(model.CiSelection.from_ints([ci])))
     score_distance = model.prox(ci_set, pref)
     score_ouv = model.ouv(ci_set, pref)

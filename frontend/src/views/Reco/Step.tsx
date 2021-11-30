@@ -7,33 +7,35 @@ import {fetchCiRandom, fetchCiReco} from 'services/backend';
 
 
 const Step: React.FC<{onSelectCi: (ci: Ci) => void, selectedCis: Ci[],
-  nReco: number, ciNames: CiNames}>
-    = ({onSelectCi, selectedCis, nReco, ciNames}) => {
+  nReco: number, ciNames: CiNames | undefined, dataVersion: string | undefined}>
+    = ({onSelectCi, selectedCis, nReco, ciNames, dataVersion}) => {
   const [ciRecoState, setCiRecoState] = useState<CiReco | undefined>(undefined);
 
   useEffect(() => {
-    if (selectedCis.length === 0) {
-      fetchCiRandom(nReco * 3)
-        .then(cis => {
-          if (cis.length === 0) {
-            console.error("Received 0 random CI from backend.");
-          } else {
-              const cir = ciReco(
-                cis.slice(0,nReco), 
-                cis.slice(nReco,nReco * 2), 
-                cis.slice(nReco * 2, nReco * 3));
-            setCiRecoState(cir);
-          }
-        });
-    } else {
-      fetchCiReco(nReco, selectedCis)
-        .then(res => {
-          setCiRecoState(res)
-        });
+    if (dataVersion !== undefined) {
+      if (selectedCis.length === 0) {
+        fetchCiRandom(dataVersion, nReco * 3)
+          .then(cis => {
+            if (cis.length === 0) {
+              console.error("Received 0 random CI from backend.");
+            } else {
+                const cir = ciReco(
+                  cis.slice(0,nReco), 
+                  cis.slice(nReco,nReco * 2), 
+                  cis.slice(nReco * 2, nReco * 3));
+              setCiRecoState(cir);
+            }
+          });
+      } else {
+        fetchCiReco(dataVersion, nReco, selectedCis)
+          .then(res => {
+            setCiRecoState(res)
+          });
+      }
     }
-  }, [selectedCis, nReco]);
+  }, [selectedCis, nReco, dataVersion]);
 
-  if (ciRecoState === undefined) {
+  if (ciRecoState === undefined || ciNames === undefined) {
     return (
       <div>
         <p>Chargement…</p>

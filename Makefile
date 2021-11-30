@@ -16,6 +16,8 @@ rsync -irtptPl --delete --info=progress2 \
     --exclude .pytest_cache \
     --exclude __pycache__ \
     --exclude .env \
+    --exclude .env-deploy \
+    --exclude .env-docker-local \
     --exclude .envrc
 endef
 

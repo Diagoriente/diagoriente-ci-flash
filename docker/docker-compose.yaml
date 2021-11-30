@@ -22,7 +22,7 @@ services:
         environment:
             FRONTEND_URL: $FRONTEND_URL
             PYTHONPATH: /app/backend/
-            COEFDATAFILE: "data/Cotations CI - Moyennes.csv"
+            COEFDATAFOLDER: $COEFDATAFOLDER
         restart: always
 
 

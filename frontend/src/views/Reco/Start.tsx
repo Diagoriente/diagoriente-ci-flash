@@ -4,13 +4,13 @@ import React, {useState, useEffect} from 'react';
 import {fetchCiRandom} from 'services/backend';
 
 
-const Start: React.FC<{ onYes: (ci: Ci) => void, ciNames: CiNames }>
-    = ({onYes, ciNames}) => {
+const Start: React.FC<{ dataVersion: string, onYes: (ci: Ci) => void, ciNames: CiNames }>
+    = ({dataVersion, onYes, ciNames}) => {
 
   const [ci, setCi] = useState<Ci | undefined>(undefined);
 
   const getNewRandomCi = (): void => {
-    fetchCiRandom(1)
+    fetchCiRandom(dataVersion, 1)
       .then(cis =>
         cis.length === 0 ?
           console.error("Received 0 random CI from backend.") :

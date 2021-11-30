@@ -107,8 +107,7 @@ def prox(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
             ~np.isnan(ci_set.axes) & ~np.isnan(preferences.axes),
             axis = 1)
     res: npt.NDArray[np.float64] = \
-        np.nansum(np.abs(ci_set.axes - preferences.axes), axis = 1) \
-        / n_valid
+        np.nansum(np.abs(ci_set.axes - preferences.axes), axis = 1) / n_valid # type: ignore
     return res
 
 
@@ -118,8 +117,8 @@ def ouv(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
     res: npt.NDArray[np.float64] = np.zeros(n_ci)
     for j in range(n_axes):
         d_j = abs_diff[:, j]
-        prod_d_j_prim = 1 + np.nanmean(np.delete(abs_diff, j, axis = 1), axis=1)
-        res = np.nanmax(np.array([res, d_j / prod_d_j_prim]), axis = 0)
+        prod_d_j_prim = 1 + np.nanmean(np.delete(abs_diff, j, axis = 1), axis=1) # type: ignore
+        res = np.nanmax(np.array([res, d_j / prod_d_j_prim]), axis = 0) # type: ignore
     return res
 
 
