@@ -6,8 +6,9 @@ const encode = (x: string | undefined): string | null => x === undefined ? null 
 
 
 export function useDataVersion(defaultValue: string | undefined) {
-  return useStateSP<string | undefined>(defaultValue, "dataVersion", decode,
-      encode);
+  const [dataVersion, setDataVersion] = 
+    useStateSP<string | undefined>(defaultValue, "dataVersion", decode, encode);
+  return [dataVersion, setDataVersion] as const;
 }
 
 export default useDataVersion;
