@@ -1,4 +1,4 @@
-import {Ci} from "utils/helpers/Ci";
+import {Ci, ci} from "utils/helpers/Ci";
 import {CiNames} from "utils/helpers/CiNames";
 import React from 'react';
 import useCiRecommendations from 'hooks/useCiRecommendations';
@@ -17,7 +17,7 @@ type StepPropsType = {
 
 const Step: React.FC<StepPropsType> = ({onSelectCi, selectedCis, nReco, ciNames,
     dataVersion}) => {
-  const ciRecoState = useCiRecommendations(selectedCis, nReco, dataVersion);
+  const [ciRecoState, reShuffle] = useCiRecommendations(selectedCis, nReco, dataVersion);
 
   if (ciRecoState === undefined || ciNames === undefined) {
     return <p>Chargement…</p>;
@@ -61,6 +61,14 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, selectedCis, nReco, ciNames,
             <CiRecommendationList onSelect={onSelectCi}
               items={ciRecoState.ciDistant} ciNames={ciNames}/>
           </div>
+        </div>
+        <div>
+          <button 
+            className="w-full bg-yellow-100 ring-yellow-300 text-black" 
+            onClick={() => reShuffle()}
+          >
+            Proposez-moi autre chose !
+          </button>
         </div>
       </div>
     );

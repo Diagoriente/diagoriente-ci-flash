@@ -23,13 +23,17 @@ export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
     .then(r => ciNamesFromRecord(r)));
 }
 
-export async function fetchCiRandom(dataVersion: string, n: number): Promise<Ci[]> {
+export async function fetchCiRandom(dataVersion: string, n: number, 
+    excluding: Ci[]): Promise<Ci[]> {
   const req = new URL(BACKEND_URL + "ci_random")
   req.searchParams.set("data_version", dataVersion);
   req.searchParams.set("n", n.toString());
   const errorMsg =  "Could not fetch random CIs.";
-  return (fetch(req.toString())
-    .catch(throwNetworkError(req, errorMsg))
+  return (fetch(req.toString(), {
+      method: "POST",
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify(excluding.map(ci => ci.id.toString()))
+  }).catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<number[]>(req, errorMsg))
     .then(r => r.map(ci)));
 }

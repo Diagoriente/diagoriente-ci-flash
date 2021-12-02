@@ -122,10 +122,11 @@ def ouv(ci_set: CiSet, preferences: Model) -> npt.NDArray[np.float64]:
     return res
 
 
-def ci_random(n: int, ci_set: CiSet) -> CiSelection:
-    ids: list[CiId] = ci_set.ids.ids
-    random_selection = rg.choice(len(ids), size = n, replace = False).tolist()
-    result = CiSelection.from_ints(random_selection)
+def ci_random(n: int, ci_set: CiSet, excluding: CiSelection) -> CiSelection:
+    candidates: list[CiId] = [ciId for ciId in ci_set.ids.ids
+            if not excluding.contains(ciId)]
+    random_selection = rg.choice(len(candidates), size = min(len(candidates), n), replace = False).tolist()
+    result = CiSelection(ids = [candidates[i] for i in random_selection])
     return result
 
 

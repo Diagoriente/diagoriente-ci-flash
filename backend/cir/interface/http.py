@@ -34,13 +34,14 @@ async def get_ci_names(data_version: str) -> dict[int, str]:
     return dict(enumerate(ci_names))
 
 
-@app.get("/ci_random")
-async def ci_random(data_version: str, n: int) -> list[int]:
+@app.post("/ci_random")
+async def ci_random(data_version: str, n: int, selected_cis: list[int]) -> list[int]:
     _, ci_set = ci_set_collection[data_version]
     pass_ci_id_or_raise(data_version, n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
-    cis = [x.val for x in model.ci_random(n, ci_set).ids]
+    excluding: model.CiSelection = model.CiSelection.from_ints(selected_cis)
+    cis = [x.val for x in model.ci_random(n, ci_set, excluding).ids]
     return cis
 
 
