@@ -1,22 +1,10 @@
-import {Ci, ci} from 'utils/helpers/Ci';
+import {ciFromStringOrFail} from 'utils/helpers/Ci';
+import {CiMap, ciMap} from 'utils/helpers/CiMap';
 
+export type CiNames = CiMap<string>;
 
-export type CiNames = {
-  map: Record<number, string>;
-  get: (ci: Ci) => string;
-  array: () => {ci: Ci, name: string}[];
-}
-
-
-export const ciNamesFromRecord = (rec: Record<number, string>): CiNames => {
-  return {
-    map: rec,
-    get: (ci: Ci): string => rec[ci.id],
-    array: (): {ci: Ci, name: string}[] => {
-      return Object.entries(rec).map(([ciId, ciName]) => { 
-        return{ci: ci(+ciId), name: ciName}
-      });
-    },
-  };
-};
+export const ciNamesFromRecord = (rec: Record<number, string>): CiNames =>
+  ciMap(Object.entries(rec).map(([ciId, ciName]) =>
+    [ciFromStringOrFail(ciId), ciName]
+  ));
 

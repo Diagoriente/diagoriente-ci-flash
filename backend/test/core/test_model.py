@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 from cir.core.model import *
 
@@ -95,3 +94,28 @@ def test_ci_selection_union() -> None:
     ci_sel_1 = CiSelection.from_ints([1,2,3])
     ci_sel_2 = CiSelection.from_ints([3,4,5])
     assert sorted(ci_sel_1.union(ci_sel_2).to_ints()) == [1,2,3,4,5]
+
+
+def test_ci_exclusion() -> None:
+    ci_set = CiSet.from_ndarray(np.array([
+        [ 0,  0],
+        [ 1,  1],
+        [ 1, -1],
+        [-1, -1],
+        [-1,  1],
+        ]), n_axes = 2)
+
+    ci_selected = CiSelection.from_ints([0, 1])
+    ci_seen = {CiId(val = 2): 3, CiId(val = 3): 2}
+    max_seen = 3
+
+    (proches, ouv, distants) = ci_recommend(1, ci_selected, ci_seen, max_seen,
+            ci_set)
+
+    all_cis: CiSelection = proches.union(ouv).union(distants)
+
+    assert not all_cis.contains(CiId(val=0))
+    assert not all_cis.contains(CiId(val=1))
+    assert not all_cis.contains(CiId(val=2))
+    assert all_cis.contains(CiId(val=3))
+    assert all_cis.contains(CiId(val=4))

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import useCiNames from 'hooks/useCiNames';
-import useSelectedCis from 'hooks/useSelectedCis';
+import useCisSelected from 'hooks/useCisSelected';
+import useCisSeen from 'hooks/useCisSeen';
 import useDataVersion from 'hooks/useDataVersion';
 import Step from 'views/Reco/Step';
 import Info from 'views/Reco/Info';
@@ -8,7 +9,9 @@ import Info from 'views/Reco/Info';
 
 export const Reco: React.FC = () => {
   const [nReco, setNReco] = useState<number>(3);
-  const [selectedCis, addCi] = useSelectedCis();
+  const [maxSeen, setMaxSeen] = useState<number>(3);
+  const [cisSelected, addCi] = useCisSelected();
+  const [cisSeen, addCiSeen] = useCisSeen();
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
   const ciNames = useCiNames(dataVersion);
 
@@ -17,7 +20,10 @@ export const Reco: React.FC = () => {
       <div className="w-4/6">
         <Step 
           onSelectCi={addCi}
-          selectedCis={selectedCis}
+          cisSelected={cisSelected}
+          cisSeen={cisSeen}
+          onAddCiSeen={addCiSeen}
+          maxSeen={maxSeen}
           nReco={nReco}
           ciNames={ciNames}
           dataVersion={dataVersion}
@@ -26,8 +32,11 @@ export const Reco: React.FC = () => {
       <Info 
         onSetNReco={setNReco}
         nReco={nReco}
+        maxSeen={maxSeen}
+        onSetMaxSeen={setMaxSeen}
         ciNames={ciNames}
-        selectedCis={selectedCis}
+        cisSelected={cisSelected}
+        cisSeen={cisSeen}
         dataVersion={dataVersion}
         onSetDataVersion={setDataVersion}
       />

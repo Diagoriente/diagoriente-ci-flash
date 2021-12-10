@@ -1,6 +1,20 @@
-export type Ci = { id: number };
+import { ValidationError } from "utils/helpers/Errors";
 
-export const ci = (id: number): Ci => Object.freeze({id: id});
+export type Ci = { 
+  id: number, 
+  toJSON: () => string
+};
+
+export const ci = (id: number): Ci => { return {
+  id: id,
+  toJSON(): string {
+    if (this === undefined) {
+      return ""
+    } else {
+      return this.id.toString();
+    }
+  },
+}};
 
 export const ciFromString = (s: string | undefined | null): Ci | null => {
   if (s === undefined || s === null) {
@@ -14,6 +28,15 @@ export const ciFromString = (s: string | undefined | null): Ci | null => {
 
   return ci(ciId);
 };
+
+export const ciFromStringOrFail = (s: string): Ci => {
+  const ci = ciFromString(s);
+  if (ci === null) {
+    throw new ValidationError(`${s} is not a valid ci identifier`);
+  } else {
+    return ci;
+  }
+}
 
 export const ciToString = (c: Ci): string => c.id.toString();
 

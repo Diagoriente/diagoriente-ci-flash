@@ -1,30 +1,36 @@
 import {Ci, ci} from "utils/helpers/Ci";
+import {CiCount} from "utils/helpers/CiCount";
 import {CiNames} from "utils/helpers/CiNames";
-import React from 'react';
+import React, { useEffect } from 'react';
 import useCiRecommendations from 'hooks/useCiRecommendations';
 import CiRecommendationList from 'components/CiRecommendationList';
 import {NavLink} from 'react-router-dom';
 
 
 type StepPropsType = {
-  onSelectCi: (ci: Ci) => void, 
-  selectedCis: Ci[],
+  onSelectCi: (ci: Ci) => void,
+  onAddCiSeen: (ci: Ci[]) => void,
+  cisSelected: Ci[],
+  cisSeen: CiCount,
+  maxSeen: number,
   nReco: number, 
   ciNames: CiNames | undefined, 
   dataVersion: string | undefined
 };
 
 
-const Step: React.FC<StepPropsType> = ({onSelectCi, selectedCis, nReco, ciNames,
-    dataVersion}) => {
-  const [ciRecoState, reShuffle] = useCiRecommendations(selectedCis, nReco, dataVersion);
+const Step: React.FC<StepPropsType> = ({onSelectCi, onAddCiSeen, cisSelected, cisSeen,
+  maxSeen, nReco, ciNames, dataVersion}) => {
+
+  const [ciRecoState, reShuffle] = useCiRecommendations(cisSelected, cisSeen,
+    maxSeen, nReco, dataVersion);
 
   if (ciRecoState === undefined || ciNames === undefined) {
     return <p>Chargement…</p>;
   } else {
 
     let prompt;
-    if (selectedCis.length === 0) {
+    if (cisSelected.length === 0) {
       prompt = (
         <p className="text-center">
           Choisissez un centre d'intérêt (ou 
@@ -48,7 +54,14 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, selectedCis, nReco, ciNames,
         <div className="flex space-x-5">
           <div className="w-1/3 space-y-4">
             <p className="text-center">(proches)</p>
-            <CiRecommendationList onSelect={onSelectCi}
+            <CiRecommendationList 
+              onSelect={(ci: Ci) => {
+                onSelectCi(ci);
+                const seen = [...ciRecoState.ciClose, ...ciRecoState.ciOpening,
+                ...ciRecoState.ciDistant];
+                console.log("ONADDCISEEN " + JSON.stringify(seen.map((ci: Ci) => [ci.id.toString(), ciNames.get(ci)])));
+                onAddCiSeen(seen);
+              }}
               items={ciRecoState.ciClose} ciNames={ciNames}/>
           </div>
           <div className="w-1/3 space-y-4">

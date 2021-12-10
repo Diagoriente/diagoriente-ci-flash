@@ -93,9 +93,9 @@ const VisuScores: React.FC = () => {
           defaultValue={curCi.id}
           onChange={e => setCurCi(ci(+e.target.value))}
         >
-          {ciNames?.array().map(({ci, name}) => 
+          {ciNames?.entries().map(([ci, val]) => 
              <option key={ci.id} value={ci.id}>
-               {name}
+               {val}
              </option>)}
         </select>
       </div>

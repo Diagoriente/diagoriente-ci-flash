@@ -1,4 +1,5 @@
 import {Ci, ci} from 'utils/helpers/Ci';
+import {CiCount, ciCount} from 'utils/helpers/CiCount';
 import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {CiReco, ciReco} from 'utils/helpers/CiReco';
 import {CiScores, ciScoresFromRecord} from 'utils/helpers/CiScores';
@@ -39,26 +40,36 @@ export async function fetchCiRandom(dataVersion: string, n: number,
 }
 
 
-export async function fetchCiReco(dataVersion: string, n: number, selectedCi: Ci[]): Promise<CiReco> {
+export async function fetchCiReco(dataVersion: string, n: number,
+  cisSelected: Ci[], cisSeen: CiCount, maxSeen: number): Promise<CiReco> {
   const req = new URL(BACKEND_URL + "ci_recommend")
   req.searchParams.set("data_version", dataVersion);
   req.searchParams.set("n", n.toString());
-  const errorMsg =  "Could not fetch random CIs.";
+  req.searchParams.set("max_seen", maxSeen.toString());
+  const errorMsg = "Could not fetch random CIs.";
 
   type CiRecoResponse = {
-      proches: number[];
-      ouverture: number[];
-      distant: number[];
+    proches: number[];
+    ouverture: number[];
+    distant: number[];
+  }
+
+  let cis_seen_obj: Record<string, number> = {};
+  for (const [ci, count] of cisSeen.entries()) {
+    cis_seen_obj[ci.toJSON()] = count;
   }
 
   return (fetch(req.toString(), {
-      method: "POST",
-      headers: {'Content-Type': 'application/json;charset=utf-8'},
-      body: JSON.stringify(selectedCi.map(ci => ci.id.toString()))
+    method: "POST",
+    headers: {'Content-Type': 'application/json;charset=utf-8'},
+    body: JSON.stringify({
+      "cis_selected": cisSelected,
+      "cis_seen": cis_seen_obj,
+      }),
   }).catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<CiRecoResponse>(req, errorMsg))
     .then((r: CiRecoResponse) =>
-        ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))));
+      ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))));
 }
 
 
