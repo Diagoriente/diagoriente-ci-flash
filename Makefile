@@ -1,6 +1,7 @@
 SHELL := /bin/bash
 
-docker-compose = docker-compose -f docker/docker-compose.yaml --project-directory ./
+docker-compose = docker-compose -f docker/docker-compose.yaml \
+	                      --project-directory ./
 
 none:
 	@echo "Please enter a target expliticly."
@@ -32,7 +33,7 @@ sync-ovh:
 
 .PHONY: docker-build
 docker-build: pre-build
-	$(docker-compose) --env-file build
+	$(docker-compose) --env-file .env-docker-local build
 
 .PHONY: docker-up
 docker-up: pre-build
@@ -46,7 +47,7 @@ deploy: sync-ovh .env-deploy pre-build
 
 .PHONY: docker-down
 docker-down:
-	$(docker-compose) down
+	$(docker-compose) --env-file .env-docker-local down
 
 .PHONY: pre-build
 pre-build: static/Readme.md ;
