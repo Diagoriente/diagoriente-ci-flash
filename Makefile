@@ -33,21 +33,21 @@ sync-ovh:
 
 .PHONY: docker-build
 docker-build: pre-build
-	$(docker-compose) --env-file .env-docker-local build
+	set -a; . .env-docker-local; set +a; $(docker-compose)  build
 
 .PHONY: docker-up
 docker-up: pre-build
-	$(docker-compose) --env-file .env-docker-local up --build -d
+	set -a; . .env-docker-local; set +a; $(docker-compose) up --build -d
 
 .PHONY: deploy
 deploy: sync-ovh .env-deploy pre-build
 	rsync -rtptPl .env-deploy ovh-vps-test:Diagoriente/.env-deploy
 	ssh ovh-vps-test bash -c "'cd Diagoriente \
-		&& $(docker-compose) --env-file .env-deploy up --build -d'"
+		&& set -a; . .env-deploy; set +a; $(docker-compose) up --build -d'"
 
 .PHONY: docker-down
 docker-down:
-	$(docker-compose) --env-file .env-docker-local down
+	set -a; . .env-docker-local; set +a; $(docker-compose) down
 
 .PHONY: pre-build
 pre-build: static/Readme.md ;

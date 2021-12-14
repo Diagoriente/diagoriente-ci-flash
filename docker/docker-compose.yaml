@@ -23,6 +23,7 @@ services:
             FRONTEND_URL: $FRONTEND_URL
             PYTHONPATH: /app/backend/
             COEFDATAFOLDER: $COEFDATAFOLDER
+            METIERS_COEF_FILE: $METIERS_COEF_FILE
         restart: always
 
 
