@@ -5,6 +5,7 @@ import useCisSeen from 'hooks/useCisSeen';
 import useDataVersion from 'hooks/useDataVersion';
 import Step from 'views/Reco/Step';
 import Info from 'views/Reco/Info';
+import Metiers from 'views/Reco/Metiers';
 
 
 export const Reco: React.FC = () => {
@@ -17,14 +18,19 @@ export const Reco: React.FC = () => {
 
   return (
     <div className="flex space-x-20 items-start">
-      <div className="w-4/6">
-        <Step 
+      <div className="flex-col w-4/6 space-y-10">
+        <Step
           onSelectCi={addCi}
           cisSelected={cisSelected}
           cisSeen={cisSeen}
           onAddCiSeen={addCiSeen}
           maxSeen={maxSeen}
           nReco={nReco}
+          ciNames={ciNames}
+          dataVersion={dataVersion}
+        />
+        <Metiers
+          cisSelected={cisSelected}
           ciNames={ciNames}
           dataVersion={dataVersion}
         />

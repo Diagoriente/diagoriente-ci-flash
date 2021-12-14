@@ -1,9 +1,11 @@
 from cir import constants
 from cir.core import model
-from cir.interface.csv import ci_set_collection
+import cir.interface.csv as csv
+from cir.util import DataSet
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
+from pathlib import Path
 
 app = FastAPI()
 
@@ -15,28 +17,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def pass_ci_id_or_raise(data_version: str, i: int, msg: str) -> None:
-    _, ci_set = ci_set_collection[data_version]
+def pass_ci_id_or_raise(dataset: DataSet, i: int, msg: str) -> None:
+    ci_set = csv.get_ci_set(dataset)
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
 
 
-@app.get("/data_versions")
-async def get_data_versions() -> list[str]:
-    return sorted(list(ci_set_collection.keys()))
+@app.get("/ci_data_versions")
+async def get_ci_data_versions() -> list[str]:
+    return sorted([str(d.ci_path) for d in csv.datasets])
 
 
 @app.get("/ci_names")
-async def get_ci_names(data_version: str) -> dict[int, str]:
-    print("AAAAA" + data_version)
-    ci_names, _ = ci_set_collection[data_version]
+async def get_ci_names(ci_data_version: str) -> dict[int, str]:
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_names = csv.get_ci_names(dataset)
     return dict(enumerate(ci_names))
 
 
 @app.post("/ci_random")
-async def ci_random(data_version: str, n: int, selected_cis: list[int]) -> list[int]:
-    _, ci_set = ci_set_collection[data_version]
-    pass_ci_id_or_raise(data_version, n,
+async def ci_random(ci_data_version: str, n: int, selected_cis: list[int]) -> list[int]:
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_set = csv.get_ci_set(dataset)
+    pass_ci_id_or_raise(dataset, n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
     excluding: model.CiSelection = model.CiSelection.from_ints(selected_cis)
@@ -45,10 +54,14 @@ async def ci_random(data_version: str, n: int, selected_cis: list[int]) -> list[
 
 
 @app.post("/ci_recommend")
-async def ci_recommend(data_version: str, n: int, cis_selected: list[int],
+async def ci_recommend(ci_data_version: str, n: int, cis_selected: list[int],
         cis_seen: dict[int, int], max_seen: int) -> dict[str, list[int]]:
-    _, ci_set = ci_set_collection[data_version]
-    pass_ci_id_or_raise(data_version, n,
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_set = csv.get_ci_set(dataset)
+    pass_ci_id_or_raise(dataset, n,
                         f"Query parameter 'n' must be a integer between 0 and " +
                         f"{ci_set.size() - 1} included.")
 
@@ -77,8 +90,12 @@ async def ci_recommend(data_version: str, n: int, cis_selected: list[int],
     }
 
 @app.get("/ci_scores")
-async def ci_scores(data_version: str, ci: int) -> dict[int, dict[str,float]]:
-    _, ci_set = ci_set_collection[data_version]
+async def ci_scores(ci_data_version: str, ci: int) -> dict[int, dict[str,float]]:
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_set = csv.get_ci_set(dataset)
     pref = model.approximate_preferences(ci_set.select(model.CiSelection.from_ints([ci])))
     score_distance = model.prox(ci_set, pref)
     score_ouv = model.ouv(ci_set, pref)
@@ -87,3 +104,32 @@ async def ci_scores(data_version: str, ci: int) -> dict[int, dict[str,float]]:
               "ouverture": score_ouv[ci_id.val]}
            for ci_id in ci_set.ids 
            if ci_id.val != ci and ~np.isnan(score_ouv[ci_id.val]) and ~np.isnan(score_distance[ci_id.val])}
+
+@app.post("/metiers_recommend")
+async def metiers_recommend(ci_data_version: str, n: int,
+        cis_selected: list[int]) -> list[str]:
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_names = csv.get_ci_names(dataset)
+    metiers = csv.get_metiers(dataset)
+
+    return metiers.recommend(model.CiSelection.from_ints(cis_selected), 
+            ci_names, n)
+
+
+@app.post("/metiers_recommend_with_score")
+async def metiers_recommend_with_score(ci_data_version: str, n: int,
+        cis_selected: list[int]) -> list[tuple[str, np.float64]]:
+    dataset = DataSet(
+            ci_path = Path(ci_data_version),
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_names = csv.get_ci_names(dataset)
+    metiers = csv.get_metiers(dataset)
+
+    return metiers.recommend_with_score(
+            model.CiSelection.from_ints(cis_selected), ci_names, n)
+
+

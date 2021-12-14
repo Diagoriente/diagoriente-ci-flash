@@ -1,3 +1,5 @@
+from pathlib import Path
+from dataclasses import dataclass
 import numpy as np
 import cir.constants as constants
 import time
@@ -8,3 +10,8 @@ if constants.RNGSEED != None:
 else:
     seed = time.time_ns()
     rg = np.random.default_rng(constants.RNGSEED)
+
+@dataclass(frozen=True)
+class DataSet:
+    ci_path: Path
+    metiers_path: Path

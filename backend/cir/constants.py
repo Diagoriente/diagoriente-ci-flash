@@ -15,4 +15,5 @@ try:
 except:
     RNGSEED = None
 COEFDATAFOLDER: Path = Path(getenv_checked("COEFDATAFOLDER"))
+METIERS_COEF_FILE: Path = Path(getenv_checked("METIERS_COEF_FILE"))
 FRONTEND_URL = getenv_checked("FRONTEND_URL")
