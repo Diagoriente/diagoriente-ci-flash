@@ -6,12 +6,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from pathlib import Path
+from typing import Optional
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[constants.FRONTEND_URL],
+    allow_origins=constants.FRONTEND_URL,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -29,9 +30,11 @@ async def get_ci_data_versions() -> list[str]:
 
 
 @app.get("/ci_names")
-async def get_ci_names(ci_data_version: str) -> dict[int, str]:
+async def get_ci_names(
+        ci_data_version: Optional[Path] = None
+        ) -> dict[int, str]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_names = csv.get_ci_names(dataset)
@@ -39,9 +42,13 @@ async def get_ci_names(ci_data_version: str) -> dict[int, str]:
 
 
 @app.post("/ci_random")
-async def ci_random(ci_data_version: str, n: int, selected_cis: list[int]) -> list[int]:
+async def ci_random(
+        n: int,
+        selected_cis: list[int],
+        ci_data_version: Optional[Path] = None
+        ) -> list[int]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_set = csv.get_ci_set(dataset)
@@ -54,10 +61,15 @@ async def ci_random(ci_data_version: str, n: int, selected_cis: list[int]) -> li
 
 
 @app.post("/ci_recommend")
-async def ci_recommend(ci_data_version: str, n: int, cis_selected: list[int],
-        cis_seen: dict[int, int], max_seen: int) -> dict[str, list[int]]:
+async def ci_recommend(
+        n: int, 
+        cis_selected: list[int],
+        cis_seen: dict[int, int], 
+        max_seen: int,
+        ci_data_version: Optional[Path] = None
+        ) -> dict[str, list[int]]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_set = csv.get_ci_set(dataset)
@@ -90,9 +102,12 @@ async def ci_recommend(ci_data_version: str, n: int, cis_selected: list[int],
     }
 
 @app.get("/ci_scores")
-async def ci_scores(ci_data_version: str, ci: int) -> dict[int, dict[str,float]]:
+async def ci_scores(
+        ci: int,
+        ci_data_version: Optional[Path] = None
+        ) -> dict[int, dict[str,float]]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_set = csv.get_ci_set(dataset)
@@ -106,10 +121,13 @@ async def ci_scores(ci_data_version: str, ci: int) -> dict[int, dict[str,float]]
            if ci_id.val != ci and ~np.isnan(score_ouv[ci_id.val]) and ~np.isnan(score_distance[ci_id.val])}
 
 @app.post("/metiers_recommend")
-async def metiers_recommend(ci_data_version: str, n: int,
-        cis_selected: list[int]) -> list[str]:
+async def metiers_recommend(
+        n: int,
+        cis_selected: list[int],
+        ci_data_version: Optional[Path] = None
+        ) -> list[str]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_names = csv.get_ci_names(dataset)
@@ -120,10 +138,13 @@ async def metiers_recommend(ci_data_version: str, n: int,
 
 
 @app.post("/metiers_recommend_with_score")
-async def metiers_recommend_with_score(ci_data_version: str, n: int,
-        cis_selected: list[int]) -> list[tuple[str, np.float64]]:
+async def metiers_recommend_with_score(
+        n: int,
+        cis_selected: list[int],
+        ci_data_version: Optional[Path] = None
+        ) -> list[tuple[str, np.float64]]:
     dataset = DataSet(
-            ci_path = Path(ci_data_version),
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
     ci_names = csv.get_ci_names(dataset)
