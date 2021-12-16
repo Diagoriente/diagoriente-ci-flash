@@ -1,15 +1,11 @@
-import {Ci, ci} from "utils/helpers/Ci";
-import {CiCount} from "utils/helpers/CiCount";
+import {CiSet} from "utils/helpers/CiSet";
 import {CiNames} from "utils/helpers/CiNames";
 import React, { useState } from 'react';
-import useCiRecommendations from 'hooks/useCiRecommendations';
-import CiRecommendationList from 'components/CiRecommendationList';
-import {NavLink} from 'react-router-dom';
 import useMetiersRecommendations from "hooks/useMetiersRecommendations";
 
 
 type PropsType = {
-  cisSelected: Ci[],
+  cisSelected: CiSet,
   ciNames: CiNames | undefined, 
   dataVersion: string | undefined
 };

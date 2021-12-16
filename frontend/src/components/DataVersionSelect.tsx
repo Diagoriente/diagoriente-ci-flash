@@ -11,6 +11,8 @@ const DataVersionSelect: React.FC<{
 
   const dataVersions = useDataVersions(curDataVersion, onSelect);
 
+  console.log(`DataVersionSelect: curDataVersion is ${curDataVersion}`)
+
   return (
     <div className="text-left">
       <label className="inline" htmlFor="data-version-select">{label}</label>
@@ -19,10 +21,11 @@ const DataVersionSelect: React.FC<{
         name="data-version-select"
         id="data-version-select"
         defaultValue={curDataVersion}
+        value={curDataVersion}
         onChange={e => onSelect(e.target.value)}
       >
         {
-          dataVersions.map((version) => 
+          dataVersions?.list.map((version) => 
             <option key={version} value={version}>
               {version}
             </option>

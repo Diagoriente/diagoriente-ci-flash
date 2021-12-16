@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 from pathlib import Path
 from typing import Optional
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -23,10 +24,16 @@ def pass_ci_id_or_raise(dataset: DataSet, i: int, msg: str) -> None:
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
 
+class DataVersions(BaseModel):
+    default: Path
+    list: list[Path]
 
 @app.get("/ci_data_versions")
-async def get_ci_data_versions() -> list[str]:
-    return sorted([str(d.ci_path) for d in csv.datasets])
+async def get_ci_data_versions() -> DataVersions:
+    return DataVersions(
+            default=constants.DEFAULTCOEFDATAFILE,
+            list=sorted([d.ci_path for d in csv.datasets])
+    )
 
 
 @app.get("/ci_names")

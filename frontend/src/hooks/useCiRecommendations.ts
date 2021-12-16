@@ -1,10 +1,10 @@
-import {Ci} from "utils/helpers/Ci";
+import {CiSet} from "utils/helpers/CiSet";
 import {CiCount} from "utils/helpers/CiCount";
 import {CiReco, ciReco} from "utils/helpers/CiReco";
 import {useState, useEffect, useCallback} from 'react';
 import {fetchCiRandom, fetchCiReco} from 'services/backend';
 
-function useCiRecommendations(cisSelected: Ci[], cisSeen: CiCount,
+function useCiRecommendations(cisSelected: CiSet, cisSeen: CiCount,
   maxSeen: number, nReco: number, dataVersion: string | undefined) {
   const [ciRecoState, setCiRecoState] = useState<CiReco | undefined>(undefined);
 
@@ -13,7 +13,7 @@ function useCiRecommendations(cisSelected: Ci[], cisSeen: CiCount,
       if (dataVersion !== undefined) {
         fetchCiRandom(
           dataVersion, nReco * 3,
-          [...cisSelected, ...Array.from(cisSeen.keys())]
+          cisSelected.insert(Array.from(cisSeen.keys()))
         )
           .then(cis => {
             if (cis.length === 0) {
@@ -33,7 +33,7 @@ function useCiRecommendations(cisSelected: Ci[], cisSeen: CiCount,
 
   useEffect(() => {
     if (dataVersion !== undefined) {
-      if (cisSelected.length === 0) {
+      if (cisSelected.size() === 0) {
         drawRandomReco();
       } else {
         fetchCiReco(dataVersion, nReco, cisSelected, cisSeen, maxSeen)

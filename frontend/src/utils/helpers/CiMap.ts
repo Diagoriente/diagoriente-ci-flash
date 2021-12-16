@@ -1,25 +1,28 @@
-import { Ci, ciFromStringOrFail } from 'utils/helpers/Ci';
+import { Ci, ci} from 'utils/helpers/Ci';
 
 export type CiMap<T> = Readonly<{
   entries: () => [Ci, T][];
   keys: () => Ci[];
-  rec: Record<number, T>;
+  rec: Map<number, T>;
   get: (ci: Ci) => T | undefined;
   getOrFail: (ci: Ci) => T;
   update: ([ci, val]: [Ci, T][]) => CiMap<T>;
+  size: () => number;
 }>;
 
 export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> { 
-  const rec: Record<number, T> = {};
+  const rec: Map<number, T> = new Map();
 
   for (let [ci, val] of entries) {
-    rec[ci.id] = val;
+    rec.set(ci.id, val);
   }
 
-  const get = (ci: Ci): T | undefined => rec[ci.id];
+  const size = () => rec.size;
+
+  const get = (ci: Ci): T | undefined => rec.get(ci.id);
 
   const getOrFail = (ci: Ci): T => {
-    let res = rec[ci.id];
+    let res = rec.get(ci.id);
     if (res === undefined) {
       throw Error(`CiMap.getOrFail: CI ${ci} not found.`);
     } else {
@@ -28,13 +31,13 @@ export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> {
   };
 
   const get_entries: () => [ci: Ci, val: T][] = () =>
-    Object.entries(rec).map(([ciId, val]) => { 
-      return [ciFromStringOrFail(ciId), val];
+    Array.from(rec.entries()).map(([ciId, val]) => { 
+      return [ci(ciId), val];
     });
 
   const keys: () => Ci[] = () =>
-    Object.entries(rec).map(([ciId, val]) => {
-      return ciFromStringOrFail(ciId);
+    Array.from(rec.entries()).map(([ciId]) => {
+      return ci(ciId);
     });
 
   const update = (entries: [Ci, T][]): CiMap<T> =>
@@ -47,6 +50,7 @@ export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> {
     entries: get_entries,
     keys: keys,
     update: update,
+    size: size,
   });
 
   return result;

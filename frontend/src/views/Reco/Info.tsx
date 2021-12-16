@@ -1,8 +1,8 @@
 import React from 'react';
 import {Ci} from 'utils/helpers/Ci';
+import {CiSet} from 'utils/helpers/CiSet';
 import {CiNames} from 'utils/helpers/CiNames';
 import {CiCount} from 'utils/helpers/CiCount';
-import useDataVersions from 'hooks/useDataVersions';
 import DataVersionSelect from 'components/DataVersionSelect';
 
 
@@ -12,7 +12,7 @@ export const Info: React.FC<{
     maxSeen: number,
     onSetMaxSeen: (n: number) => void,
     ciNames: CiNames | undefined,
-    cisSelected: Ci[],
+    cisSelected: CiSet,
     cisSeen: CiCount,
     dataVersion: string | undefined,
     onSetDataVersion: (version: string) => void}> =
@@ -46,12 +46,12 @@ export const Info: React.FC<{
       </div>
       <p>CI séléctionés:</p>
       <ul className="list-disc list-outside pl-4">
-        {cisSelected.slice().reverse().map(ci => <li key={ci.id}>{ciNames?.get(ci)}</li>)}
+        {cisSelected.values().slice().reverse().map(ci => <li key={ci.id}>{ciNames?.get(ci)}</li>)}
       </ul>
       <p>CI exclus:</p>
       <ul className="list-disc list-outside pl-4">
         {cisSeen.entries()
-          .filter(([ci, count]: [Ci, number]): boolean => count >= maxSeen)
+          .filter(([_, count]: [Ci, number]): boolean => count >= maxSeen)
           .map(([ci, count]: [Ci, number]) =>
             <li key={ci.id}>{ciNames?.get(ci)} ({count})</li>
           )

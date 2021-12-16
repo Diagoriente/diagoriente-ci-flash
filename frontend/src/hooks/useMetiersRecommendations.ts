@@ -1,13 +1,13 @@
-import {Ci} from 'utils/helpers/Ci';
+import {CiSet} from 'utils/helpers/CiSet';
 import {useState, useEffect} from 'react';
 import {fetchMetiersReco} from 'services/backend';
 
-function useMetiersRecommendations(cisSelected: Ci[], n: number, dataVersion: string | undefined) {
+function useMetiersRecommendations(cisSelected: CiSet, n: number, dataVersion: string | undefined) {
   const [metiersReco, setMetiersReco] = useState<[string, number][] | undefined>(undefined);
 
   useEffect(() => {
     if (dataVersion !== undefined) {
-      if (cisSelected.length > 0) {
+      if (cisSelected.size() > 0) {
         fetchMetiersReco(dataVersion, n, cisSelected)
           .then(setMetiersReco)
       }

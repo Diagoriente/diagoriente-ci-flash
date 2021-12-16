@@ -1,17 +1,19 @@
 import {Ci, ci} from 'utils/helpers/Ci';
+import {CiSet} from 'utils/helpers/CiSet';
 import {CiCount} from 'utils/helpers/CiCount';
 import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {CiReco, ciReco} from 'utils/helpers/CiReco';
 import {CiScores, ciScoresFromRecord} from 'utils/helpers/CiScores';
 import {BACKEND_URL} from 'utils/constants';
 import {throwNetworkError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
+import {DataVersions} from 'utils/helpers/DataVersions';
 
-export async function fetchDataVersions(): Promise<string[]> {
+export async function fetchDataVersions(): Promise<DataVersions> {
   const req = new URL(BACKEND_URL + "ci_data_versions")
   const errorMsg =  "Could not fetch data versions.";
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
-    .then(jsonOrThrowHttpError<string[]>(req, errorMsg)));
+    .then(jsonOrThrowHttpError<DataVersions>(req, errorMsg)));
 }
 
 export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
@@ -25,7 +27,7 @@ export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
 }
 
 export async function fetchCiRandom(dataVersion: string, n: number, 
-    excluding: Ci[]): Promise<Ci[]> {
+    excluding: CiSet): Promise<Ci[]> {
   const req = new URL(BACKEND_URL + "ci_random")
   req.searchParams.set("ci_data_version", dataVersion);
   req.searchParams.set("n", n.toString());
@@ -33,7 +35,7 @@ export async function fetchCiRandom(dataVersion: string, n: number,
   return (fetch(req.toString(), {
       method: "POST",
       headers: {'Content-Type': 'application/json;charset=utf-8'},
-      body: JSON.stringify(excluding.map(ci => ci.id.toString()))
+      body: JSON.stringify(excluding.values().map(ci => ci.id.toString()))
   }).catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<number[]>(req, errorMsg))
     .then(r => r.map(ci)));
@@ -41,7 +43,7 @@ export async function fetchCiRandom(dataVersion: string, n: number,
 
 
 export async function fetchCiReco(dataVersion: string, n: number,
-  cisSelected: Ci[], cisSeen: CiCount, maxSeen: number): Promise<CiReco> {
+  cisSelected: CiSet, cisSeen: CiCount, maxSeen: number): Promise<CiReco> {
   const req = new URL(BACKEND_URL + "ci_recommend")
   req.searchParams.set("ci_data_version", dataVersion);
   req.searchParams.set("n", n.toString());
@@ -63,7 +65,7 @@ export async function fetchCiReco(dataVersion: string, n: number,
     method: "POST",
     headers: {'Content-Type': 'application/json;charset=utf-8'},
     body: JSON.stringify({
-      "cis_selected": cisSelected,
+      "cis_selected": cisSelected.values(),
       "cis_seen": cis_seen_obj,
       }),
   }).catch(throwNetworkError(req, errorMsg))
@@ -74,7 +76,7 @@ export async function fetchCiReco(dataVersion: string, n: number,
 
 
 export async function fetchMetiersReco(dataVersion: string, n: number,
-  cisSelected: Ci[]): Promise<[string, number][]> {
+  cisSelected: CiSet): Promise<[string, number][]> {
   const req = new URL(BACKEND_URL + "metiers_recommend_with_score")
   req.searchParams.set("ci_data_version", dataVersion);
   req.searchParams.set("n", n.toString());
@@ -83,7 +85,7 @@ export async function fetchMetiersReco(dataVersion: string, n: number,
   return (fetch(req.toString(), {
     method: "POST",
     headers: {'Content-Type': 'application/json;charset=utf-8'},
-    body: JSON.stringify(cisSelected),
+    body: JSON.stringify(cisSelected.values()),
   }).catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<[string, number][]>(req, errorMsg))
   );

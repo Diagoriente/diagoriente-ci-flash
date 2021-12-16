@@ -1,16 +1,17 @@
-import {Ci, ciListFromString, ciListToString} from 'utils/helpers/Ci';
+import {Ci} from 'utils/helpers/Ci';
+import {CiSet, ciSet, ciSetToString, ciSetFromString} from 'utils/helpers/CiSet';
 import useStateSP from 'hooks/useStateSP';
 
 export function useCisSelected() {
   const [cisSelected, setCisSelected] =
-    useStateSP<Ci[]>([], "cisSelected", ciListFromString, ciListToString);
+    useStateSP<CiSet>(ciSet([]), "cisSelected", ciSetFromString, ciSetToString);
 
   const addCi = (ci: Ci): void => {
-    setCisSelected((current: Ci[]) => {
+    setCisSelected((current: CiSet) => {
       if (current === null) {
-        return [ci];
+        return ciSet([ci]);
       } else {
-        return [...current, ci];
+        return current.insert(ci);
       }
     });
   };

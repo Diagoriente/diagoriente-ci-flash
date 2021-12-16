@@ -1,16 +1,17 @@
-import {Ci, ci} from "utils/helpers/Ci";
+import {Ci} from "utils/helpers/Ci";
+import {CiSet} from "utils/helpers/CiSet";
 import {CiCount} from "utils/helpers/CiCount";
 import {CiNames} from "utils/helpers/CiNames";
-import React, { useEffect } from 'react';
+import React from 'react';
 import useCiRecommendations from 'hooks/useCiRecommendations';
 import CiRecommendationList from 'components/CiRecommendationList';
-import {NavLink} from 'react-router-dom';
 
 
 type StepPropsType = {
   onSelectCi: (ci: Ci) => void,
   onAddCiSeen: (ci: Ci[]) => void,
-  cisSelected: Ci[],
+  cisSelected: CiSet,
+  onRestart: () => void,
   cisSeen: CiCount,
   maxSeen: number,
   nReco: number, 
@@ -19,7 +20,7 @@ type StepPropsType = {
 };
 
 
-const Step: React.FC<StepPropsType> = ({onSelectCi, onAddCiSeen, cisSelected, cisSeen,
+const Step: React.FC<StepPropsType> = ({onSelectCi, onRestart, onAddCiSeen, cisSelected, cisSeen,
   maxSeen, nReco, ciNames, dataVersion}) => {
 
   const [ciRecoState, reShuffle] = useCiRecommendations(cisSelected, cisSeen,
@@ -30,11 +31,16 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, onAddCiSeen, cisSelected, ci
   } else {
 
     let prompt;
-    if (cisSelected.length === 0) {
+    if (cisSelected.size() === 0) {
       prompt = (
         <p className="text-center">
           Choisissez un centre d'intérêt (ou 
-          <NavLink to="/Reco" reloadDocument > remélangez </NavLink>
+          <button 
+            className="bg-transparent border-none ring-0 text-indigo-500 p-0 m-0"
+            onClick={reShuffle}
+          >
+            remélangez
+          </button>
           )
         </p>
       );
@@ -42,7 +48,12 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, onAddCiSeen, cisSelected, ci
       prompt = (
         <p className="text-center">
           Choisissez un autre centre d'intérêt (ou 
-          <NavLink to="/Reco" reloadDocument> recommencez </NavLink>
+          <button 
+            className="bg-transparent border-none ring-0 text-indigo-500 p-0 m-0"
+            onClick={onRestart}
+          >
+            recommencez
+          </button>
           )
         </p>
       );

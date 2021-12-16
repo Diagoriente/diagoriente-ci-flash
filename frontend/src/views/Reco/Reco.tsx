@@ -1,4 +1,6 @@
 import React, {useState} from 'react';
+import {ciSet} from 'utils/helpers/CiSet';
+import {ciCount} from 'utils/helpers/CiCount';
 import useCiNames from 'hooks/useCiNames';
 import useCisSelected from 'hooks/useCisSelected';
 import useCisSeen from 'hooks/useCisSeen';
@@ -11,8 +13,8 @@ import Metiers from 'views/Reco/Metiers';
 export const Reco: React.FC = () => {
   const [nReco, setNReco] = useState<number>(3);
   const [maxSeen, setMaxSeen] = useState<number>(3);
-  const [cisSelected, addCi] = useCisSelected();
-  const [cisSeen, addCiSeen] = useCisSeen();
+  const [cisSelected, addCi, setCisSelected] = useCisSelected();
+  const [cisSeen, addCiSeen, setCisSeen] = useCisSeen();
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
   const ciNames = useCiNames(dataVersion);
 
@@ -22,6 +24,11 @@ export const Reco: React.FC = () => {
         <Step
           onSelectCi={addCi}
           cisSelected={cisSelected}
+          onRestart={() => {
+            setCisSelected(ciSet([]));
+            setCisSeen(ciCount());
+            }
+          }
           cisSeen={cisSeen}
           onAddCiSeen={addCiSeen}
           maxSeen={maxSeen}

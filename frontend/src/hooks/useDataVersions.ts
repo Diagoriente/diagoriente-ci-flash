@@ -1,18 +1,19 @@
 import {useState, useEffect} from 'react';
 import {fetchDataVersions} from 'services/backend';
+import {DataVersions} from 'utils/helpers/DataVersions';
 
 
 function useDataVersions(curDataVersion: string | undefined,
     setDataVersion: (dataVersions: string) => void) {
-  const [dataVersions, setDataVersions] = useState<string[]>([]);
+  const [dataVersions, setDataVersions] = useState<DataVersions | undefined>(undefined);
 
   useEffect((): void => {
     fetchDataVersions()
     .then(dataVersions => {
       setDataVersions(dataVersions);
 
-      if (dataVersions.find((item) => item === curDataVersion) === undefined) {
-        setDataVersion(dataVersions[0]);
+      if (dataVersions.list.find((item) => item === curDataVersion) === undefined) {
+        setDataVersion(dataVersions.default);
       }
     })
   }, [curDataVersion, setDataVersion]);
