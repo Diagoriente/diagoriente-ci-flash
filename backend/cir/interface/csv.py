@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from cir.core.model import CiSet
 from cir.core.metiers import Metiers
-from cir.util import DataSet
+from cir.util import DataSet, pca
 from typing import Tuple
 
 
@@ -27,9 +27,11 @@ def ci_set_from_csv(path: Path) -> Tuple[list[str], CiSet]:
                 f"{row}")
     values_arr = np.array(values, dtype=np.float64)
 
+    projected = pca(values_arr)
+
     n_axes = values_arr.shape[1]
 
-    return ci_names, CiSet.from_ndarray(values_arr, n_axes)
+    return ci_names, CiSet.from_ndarray(projected, n_axes)
 
 
 def data_version_from_path(p: str) -> str:
@@ -79,7 +81,7 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
     # Treat remaining nan values as 0.
     values_arr[np.isnan(values_arr)] = 0
 
-    reordered = np.empty(values_arr.shape) * np.nan
+    reordered: npt.NDArray[np.float64] = np.empty(values_arr.shape) * np.nan
     for i, ci_name in enumerate(ci_names):
         try:
             ci_id = ci_id_map[ci_name]
@@ -95,13 +97,16 @@ ci_names_dict: dict[DataSet, list[str]] = {}
 ci_set_dict: dict[DataSet, CiSet] = {}
 metiers_dict: dict[DataSet, Metiers] = {}
 
+
 def get_ci_names(dataset: DataSet) -> list[str]:
     ci_names, _ = get_ci_names_and_set(dataset)
     return ci_names
 
+
 def get_ci_set(dataset: DataSet) -> CiSet:
     _, ci_set = get_ci_names_and_set(dataset)
     return ci_set
+
 
 def get_ci_names_and_set(dataset: DataSet) -> tuple[list[str], CiSet]:
     if dataset not in ci_set_dict:
@@ -110,12 +115,14 @@ def get_ci_names_and_set(dataset: DataSet) -> tuple[list[str], CiSet]:
         ci_set_dict[dataset] = ci_set
     return ci_names_dict[dataset], ci_set_dict[dataset]
 
+
 def get_metiers(dataset: DataSet) -> Metiers:
     if dataset not in metiers_dict:
         ci_names = get_ci_names(dataset)
         metiers_dict[dataset] = metiers_from_csv(dataset.metiers_path,
                 ci_names)
     return metiers_dict[dataset]
+
 
 datasets: list[DataSet] = [
     DataSet(
