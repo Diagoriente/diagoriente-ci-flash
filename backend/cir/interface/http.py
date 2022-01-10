@@ -8,6 +8,7 @@ import numpy as np
 from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel
+from dataclasses import dataclass
 
 app = FastAPI()
 
@@ -19,14 +20,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def pass_ci_id_or_raise(dataset: DataSet, i: int, msg: str) -> None:
     ci_set = csv.get_ci_set(dataset)
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
 
+
 class DataVersions(BaseModel):
     default: Path
     list: list[Path]
+
 
 @app.get("/ci_data_versions")
 async def get_ci_data_versions() -> DataVersions:
@@ -34,6 +38,25 @@ async def get_ci_data_versions() -> DataVersions:
             default=constants.DEFAULTCOEFDATAFILE,
             list=sorted([d.ci_path for d in csv.datasets])
     )
+
+
+@dataclass(frozen=True)
+class CiAxesOut:
+    ci_axes: dict[int, list[np.float64]]
+    ci_names: list[str]
+
+@app.get("/ci_axes")
+async def get_ci_axes(
+        ci_data_version: Optional[Path] = None
+        ) -> CiAxesOut:
+    dataset = DataSet(
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    ci_axes = dict(enumerate(csv.get_ci_set(dataset).axes.tolist()))
+    ci_names = csv.get_ci_names(dataset)
+
+    return CiAxesOut(ci_axes = ci_axes, ci_names = ci_names)
 
 
 @app.get("/ci_names")
@@ -108,6 +131,7 @@ async def ci_recommend(
         "distant": distant.to_ints()
     }
 
+
 @app.get("/ci_scores")
 async def ci_scores(
         ci: int,
@@ -126,6 +150,7 @@ async def ci_scores(
               "ouverture": score_ouv[ci_id.val]}
            for ci_id in ci_set.ids 
            if ci_id.val != ci and ~np.isnan(score_ouv[ci_id.val]) and ~np.isnan(score_distance[ci_id.val])}
+
 
 @app.post("/metiers_recommend")
 async def metiers_recommend(
