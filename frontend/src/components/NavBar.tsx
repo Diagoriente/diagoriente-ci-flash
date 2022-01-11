@@ -20,6 +20,12 @@ const NavBar: React.FC = () => {
         <NavLink reloadDocument
           className={({isActive}: {isActive: boolean}) => 
             (isActive ? "font-bold" : "") + " inline-block"}
+          to="/Pca">
+          Pca
+        </NavLink>
+        <NavLink reloadDocument
+          className={({isActive}: {isActive: boolean}) => 
+            (isActive ? "font-bold" : "") + " inline-block"}
           to="/Readme">
           À propos
         </NavLink>

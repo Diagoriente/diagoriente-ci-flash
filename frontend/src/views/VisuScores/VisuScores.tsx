@@ -40,7 +40,7 @@ const VisuScores: React.FC = () => {
 
       const barChart = HorizontalBarChart(data, {
         x: d => d.val,
-        y: (d, i) => d.name,
+        y: (d, _) => d.name,
         title: (d: any): string => `${d3.format(".2f")(d.val)}`,
         height: 2500,
         width: 640,

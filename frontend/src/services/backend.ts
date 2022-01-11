@@ -1,4 +1,6 @@
 import {Ci, ci} from 'utils/helpers/Ci';
+import {CiAxes, ciAxesFromRecord} from 'utils/helpers/CiAxes';
+import {Pca} from 'utils/helpers/Pca';
 import {CiSet} from 'utils/helpers/CiSet';
 import {CiCount} from 'utils/helpers/CiCount';
 import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
@@ -16,6 +18,46 @@ export async function fetchDataVersions(): Promise<DataVersions> {
     .then(jsonOrThrowHttpError<DataVersions>(req, errorMsg)));
 }
 
+
+export async function fetchPca(dataVersion: string): Promise<Pca> {
+  const req = new URL(BACKEND_URL + "pca")
+  req.searchParams.set("ci_data_version", dataVersion);
+  const errorMsg = "Could not fetch PCA.";
+
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<Pca>(req, errorMsg))
+  );
+}
+
+
+export async function fetchCiAxes(dataVersion: string): Promise<CiAxes> {
+  const req = new URL(BACKEND_URL + "ci_axes")
+  req.searchParams.set("ci_data_version", dataVersion);
+  const errorMsg = "Could not fetch CI axes.";
+
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<Record<number, number[]>>(req, errorMsg))
+    .then(r => {
+      const res = ciAxesFromRecord(r);
+      return res
+    })
+  );
+}
+
+
+export async function fetchAxesNames(dataVersion: string): Promise<string[]> {
+  const req = new URL(BACKEND_URL + "axes_names")
+  req.searchParams.set("ci_data_version", dataVersion);
+  const errorMsg =  "Could not fetch axes names.";
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<string[]>(req, errorMsg))
+  );
+}
+
+
 export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
   const req = new URL(BACKEND_URL + "ci_names")
   req.searchParams.set("ci_data_version", dataVersion);
@@ -25,6 +67,7 @@ export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
     .then(jsonOrThrowHttpError<Record<number, string>>(req, errorMsg))
     .then(r => ciNamesFromRecord(r)));
 }
+
 
 export async function fetchCiRandom(dataVersion: string, n: number, 
     excluding: CiSet): Promise<Ci[]> {

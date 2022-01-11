@@ -1,5 +1,5 @@
 from cir import constants
-from cir.core import model
+from cir.core import model, stats
 import cir.interface.csv as csv
 from cir.util import DataSet
 from fastapi import FastAPI, HTTPException
@@ -32,6 +32,18 @@ class DataVersions(BaseModel):
     list: list[Path]
 
 
+@app.get("/axes_names")
+async def get_axes_names(
+        ci_data_version: Optional[Path] = None
+        ) -> list[str]:
+    dataset = DataSet(
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    axes_names = csv.get_axes_names(dataset)
+    return axes_names
+
+
 @app.get("/ci_data_versions")
 async def get_ci_data_versions() -> DataVersions:
     return DataVersions(
@@ -40,23 +52,39 @@ async def get_ci_data_versions() -> DataVersions:
     )
 
 
-@dataclass(frozen=True)
-class CiAxesOut:
-    ci_axes: dict[int, list[np.float64]]
-    ci_names: list[str]
-
 @app.get("/ci_axes")
 async def get_ci_axes(
         ci_data_version: Optional[Path] = None
-        ) -> CiAxesOut:
+        ) -> dict[int, list[np.float64]]:
     dataset = DataSet(
             ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
             metiers_path=constants.METIERS_COEF_FILE
     )
-    ci_axes = dict(enumerate(csv.get_ci_set(dataset).axes.tolist()))
-    ci_names = csv.get_ci_names(dataset)
+    return dict(enumerate(csv.get_ci_set(dataset).axes.tolist()))
 
-    return CiAxesOut(ci_axes = ci_axes, ci_names = ci_names)
+
+@dataclass
+class PcaOut:
+    components: list[list[np.float64]]
+    explained_variance: list[list[np.float64]]
+    explained_variance_ratio: list[np.float64]
+    kaiser_criteria: np.float64
+
+@app.get("/pca")
+async def get_pca(
+        ci_data_version: Optional[Path] = None
+        ) -> PcaOut:
+    dataset = DataSet(
+            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
+            metiers_path=constants.METIERS_COEF_FILE
+    )
+    pca = csv.get_pca(dataset)
+    return PcaOut(
+        components = pca.components.tolist(),
+        explained_variance = pca.explained_variance.tolist(),
+        explained_variance_ratio=pca.explained_variance_ratio.tolist(),
+        kaiser_criteria=pca.kaiser_criteria
+    )
 
 
 @app.get("/ci_names")

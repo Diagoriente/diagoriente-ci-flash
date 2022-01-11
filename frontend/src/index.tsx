@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import VisuScores from "views/VisuScores/VisuScores";
+import Pca from "views/Pca/Pca";
 import Reco from "views/Reco/Reco";
 import Readme from "views/Readme/Readme";
 
@@ -16,6 +17,7 @@ ReactDOM.render(
             <Route index element={<Reco />} />
             <Route path="Reco" element={<Reco />} />
             <Route path="VisuScores" element={<VisuScores />} />
+            <Route path="Pca" element={<Pca />} />
             <Route path="Readme" element={<Readme />} />
             <Route
               path="*"

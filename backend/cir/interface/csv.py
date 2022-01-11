@@ -7,15 +7,17 @@ import os
 from pathlib import Path
 from cir.core.model import CiSet
 from cir.core.metiers import Metiers
-from cir.util import DataSet, pca
+from cir.core.stats import Pca
+from cir.util import DataSet
 from typing import Tuple
 
 
-def ci_set_from_csv(path: Path) -> Tuple[list[str], CiSet]:
+def ci_set_from_csv(path: Path) -> Tuple[list[str], list[str], CiSet, Pca]:
     with open(path) as f:
         data = list(csv.reader(f))
 
     ci_names = [row[0] for row in data[1:]]
+    axes_names = data[0][1:]
 
     values: list[npt.NDArray[np.float64]] = []
     for i, row in enumerate(data[1:]):
@@ -27,11 +29,11 @@ def ci_set_from_csv(path: Path) -> Tuple[list[str], CiSet]:
                 f"{row}")
     values_arr = np.array(values, dtype=np.float64)
 
-    projected = pca(values_arr)
+    projected, pca = Pca.from_values(values_arr)
 
     n_axes = values_arr.shape[1]
 
-    return ci_names, CiSet.from_ndarray(projected, n_axes)
+    return ci_names, axes_names, CiSet.from_ndarray(projected, n_axes), pca
 
 
 def data_version_from_path(p: str) -> str:
@@ -94,26 +96,41 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
 
 
 ci_names_dict: dict[DataSet, list[str]] = {}
+axes_names_dict: dict[DataSet, list[str]] = {}
 ci_set_dict: dict[DataSet, CiSet] = {}
 metiers_dict: dict[DataSet, Metiers] = {}
+pca_dict: dict[DataSet, Pca] = {}
+
+
+def get_axes_names(dataset: DataSet) -> list[str]:
+    _, axes_names, _, _ = get_ci_names_and_set(dataset)
+    return axes_names
 
 
 def get_ci_names(dataset: DataSet) -> list[str]:
-    ci_names, _ = get_ci_names_and_set(dataset)
+    ci_names, _, _, _ = get_ci_names_and_set(dataset)
     return ci_names
 
 
 def get_ci_set(dataset: DataSet) -> CiSet:
-    _, ci_set = get_ci_names_and_set(dataset)
+    _, _, ci_set, _ = get_ci_names_and_set(dataset)
     return ci_set
 
 
-def get_ci_names_and_set(dataset: DataSet) -> tuple[list[str], CiSet]:
+def get_pca(dataset: DataSet) -> Pca:
+    _, _, _, pca = get_ci_names_and_set(dataset)
+    return pca
+
+
+
+def get_ci_names_and_set(dataset: DataSet) -> tuple[list[str], list[str], CiSet, Pca]:
     if dataset not in ci_set_dict:
-        ci_names, ci_set = ci_set_from_csv(Path(dataset.ci_path))
+        ci_names, axes_names, ci_set, pca = ci_set_from_csv(Path(dataset.ci_path))
         ci_names_dict[dataset] = ci_names
+        axes_names_dict[dataset] = axes_names
         ci_set_dict[dataset] = ci_set
-    return ci_names_dict[dataset], ci_set_dict[dataset]
+        pca_dict[dataset] = pca
+    return ci_names_dict[dataset], axes_names_dict[dataset], ci_set_dict[dataset], pca_dict[dataset]
 
 
 def get_metiers(dataset: DataSet) -> Metiers:

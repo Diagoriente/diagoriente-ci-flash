@@ -1,10 +1,10 @@
-import {ciFromStringOrFail} from 'utils/helpers/Ci';
-import {CiMap, ciMap} from 'utils/helpers/CiMap';
+import {CiMap, ciMapFromRecord } from 'utils/helpers/CiMap';
 
 export type CiNames = CiMap<string>;
 
-export const ciNamesFromRecord = (rec: Record<number, string>): CiNames =>
-  ciMap(Object.entries(rec).map(([ciId, ciName]) =>
-    [ciFromStringOrFail(ciId), ciName]
-  ));
-
+export const ciNamesFromRecord = ciMapFromRecord;
+//(rec: Record<number, string>): CiNames =>
+//  ciMap(Object.entries(rec).map(([ciId, ciName]) =>
+//    [ciFromStringOrFail(ciId), ciName]
+//  ));
+//
