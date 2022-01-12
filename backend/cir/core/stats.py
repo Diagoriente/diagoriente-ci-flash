@@ -1,9 +1,11 @@
+from enum import Enum
 import numpy as np
 import numpy.typing as npt
 from sklearn.decomposition import PCA # type: ignore
 from sklearn.preprocessing import scale # type: ignore
 
 from dataclasses import dataclass
+from cir.core.metiers import Metiers
 
 @dataclass(frozen=True)
 class Pca:
@@ -29,3 +31,33 @@ class Pca:
         )
 
         return projected, pca
+
+
+class CiInfluenceMethod(Enum):
+    SUM = 'sum'
+    VAR = 'var'
+
+
+def ci_coefs_metiers_quantiles(
+        metiers: Metiers,
+        quantiles: list[float] = [.25, .5, .75]) -> npt.NDArray[np.float64]:
+    mc = metiers.coefficients
+    quant = np.quantile(mc, q=quantiles, axis=0).transpose()
+    return quant
+
+
+
+def ci_influence(
+        metiers: Metiers,
+        method: CiInfluenceMethod = CiInfluenceMethod.SUM
+        ) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.int32]]:
+    mc = metiers.coefficients
+    if method == CiInfluenceMethod.SUM:
+        score = mc.sum(axis=0)
+    elif method == CiInfluenceMethod.VAR:
+        score = mc.var(axis=0)
+    else:
+        raise RuntimeError(f"CiInfluenceMethod {method} not implemented ")
+    index_sort = score.argsort()
+    rank = np.array([r for r, _ in sorted(list(enumerate(index_sort)), key = lambda x: x[1])])
+    return score, rank

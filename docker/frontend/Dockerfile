@@ -9,6 +9,7 @@ RUN npm install --production
 RUN npm i --save-dev @types/d3
 RUN npm install -D tailwindcss@npm:@tailwindcss/postcss7-compat postcss@^7 autoprefixer@^9
 RUN npm install @craco/craco
+RUN npm install @observablehq/plot
 
 COPY frontend/ /usr/local/src/frontend
 ARG REACT_APP_BACKEND_URL

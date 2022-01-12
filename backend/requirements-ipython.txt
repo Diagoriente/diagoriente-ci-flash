@@ -1,0 +1,4 @@
+# Required by matplotlib GTK backends
+pycairo
+PyGObject
+

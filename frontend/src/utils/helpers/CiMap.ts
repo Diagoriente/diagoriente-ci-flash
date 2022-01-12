@@ -9,6 +9,7 @@ export type CiMap<T> = Readonly<{
   getOrFail: (ci: Ci) => T;
   update: ([ci, val]: [Ci, T][]) => CiMap<T>;
   size: () => number;
+  fromJSON: <T>(rec: Record<string, T>) => CiMap<T>;
 }>;
 
 
@@ -49,6 +50,7 @@ export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> {
     keys: keys,
     update: update,
     size: size,
+    fromJSON: ciMapFromRecord,
   });
 
   return result;

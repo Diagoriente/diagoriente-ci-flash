@@ -4,11 +4,13 @@ import {Pca} from 'utils/helpers/Pca';
 import {CiSet} from 'utils/helpers/CiSet';
 import {CiCount} from 'utils/helpers/CiCount';
 import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
+import {CiMap, ciMapFromRecord} from 'utils/helpers/CiMap';
 import {CiReco, ciReco} from 'utils/helpers/CiReco';
 import {CiScores, ciScoresFromRecord} from 'utils/helpers/CiScores';
 import {BACKEND_URL} from 'utils/constants';
 import {throwNetworkError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
 import {DataVersions} from 'utils/helpers/DataVersions';
+
 
 export async function fetchDataVersions(): Promise<DataVersions> {
   const req = new URL(BACKEND_URL + "ci_data_versions")
@@ -31,6 +33,21 @@ export async function fetchPca(dataVersion: string): Promise<Pca> {
 }
 
 
+export async function fetchCiInfluence(dataVersion: string, method: string): 
+    Promise<CiMap<{influence: number, rank: number}>> {
+  const req = new URL(BACKEND_URL + "ci_influence")
+  req.searchParams.set("ci_data_version", dataVersion);
+  req.searchParams.set("method", method);
+  const errorMsg = "Could not fetch CI axes.";
+
+  return (fetch(req.toString())
+    .catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<Record<number, {influence: number, rank: number}>>(req, errorMsg))
+    .then(ciMapFromRecord)
+  );
+}
+
+
 export async function fetchCiAxes(dataVersion: string): Promise<CiAxes> {
   const req = new URL(BACKEND_URL + "ci_axes")
   req.searchParams.set("ci_data_version", dataVersion);
@@ -39,10 +56,7 @@ export async function fetchCiAxes(dataVersion: string): Promise<CiAxes> {
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<Record<number, number[]>>(req, errorMsg))
-    .then(r => {
-      const res = ciAxesFromRecord(r);
-      return res
-    })
+    .then(ciAxesFromRecord)
   );
 }
 
@@ -65,7 +79,24 @@ export async function fetchCiNames(dataVersion: string): Promise<CiNames> {
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<Record<number, string>>(req, errorMsg))
-    .then(r => ciNamesFromRecord(r)));
+    .then(ciNamesFromRecord)
+  );
+}
+
+
+export async function fetchCiCoefsMetiersQuantiles(dataVersion: string,
+    quantiles: number[]): Promise<CiMap<number[]>> {
+  const req = new URL(BACKEND_URL + "ci_coefs_metiers_quantiles")
+  req.searchParams.set("ci_data_version", dataVersion);
+  const errorMsg =  "Could not fetch random CIs.";
+  return (fetch(req.toString(), {
+      method: "POST",
+      headers: {'Content-Type': 'application/json;charset=utf-8'},
+      body: JSON.stringify(quantiles)
+  }).catch(throwNetworkError(req, errorMsg))
+    .then(jsonOrThrowHttpError<Record<number, number[]>>(req, errorMsg))
+    .then(ciMapFromRecord)
+  );
 }
 
 
@@ -143,5 +174,5 @@ export async function fetchCiScores(dataVersion: string, ci: Ci): Promise<CiScor
   return (fetch(req.toString())
     .catch(throwNetworkError(req, errorMsg))
     .then(jsonOrThrowHttpError<CiScores>(req, errorMsg))
-    .then(r => ciScoresFromRecord(r)));
+    .then(ciScoresFromRecord));
 }

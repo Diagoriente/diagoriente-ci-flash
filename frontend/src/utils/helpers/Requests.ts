@@ -22,7 +22,7 @@ export class HttpError extends Error {
 };
 
 
-export const jsonOrThrowHttpError = <T> (url: URL, msg: string) => 
+export const jsonOrThrowHttpError = <T>(url: URL, msg: string) => 
     (response: Response): Promise<T> => {
   if (response.ok) {
     return response.json()

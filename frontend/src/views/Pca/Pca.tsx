@@ -31,17 +31,20 @@ const Pca: React.FC = () => {
         [0, 0]
       );
 
-      const scatterCi = Plot.dot(data, {x: "F1", y: "F2"}).plot({
+      const plot = Plot.plot({
         width: 400,
         height: 400,
         x: {domain: [dmin, dmax], grid: true},
         y: {domain: [dmin, dmax], grid: true},
+        marks: [
+          Plot.dot(data, {x: "F1", y: "F2"})
+        ]
       });
 
-      d3.select("#scatter-ci").append(() => scatterCi);
+      d3.select("#scatter-ci").append(() => plot);
 
       return () => {
-        scatterCi?.remove();
+        plot?.remove();
       };
     }
   },
@@ -49,17 +52,16 @@ const Pca: React.FC = () => {
 
   useEffect(() => {
     if (pca !== undefined) {
-      const bars = Plot.barY(pca?.explained_variance_ratio.entries(), {
-        y: (d: number[]) => d[1],
-        x: (d: number[]) => `F${d[0]+1}`
-      })
-
-      const line = Plot.ruleY([pca?.kaiser_criteria],
-        {"stroke": "red"}
-      );
-
       const plot = Plot.plot({
-        marks: [bars, line],
+        marks: [
+          Plot.barY(pca?.explained_variance_ratio.entries(), {
+            y: (d: number[]) => d[1],
+            x: (d: number[]) => `F${d[0]+1}`
+          }),
+          Plot.ruleY([pca?.kaiser_criteria],
+            {"stroke": "red"}
+          )
+        ],
         width: 400,
         height: 250,
       });
@@ -77,11 +79,6 @@ const Pca: React.FC = () => {
           return {label: (axesNames?.[i] || i), F1: comp[0], F2: comp[1]};
       });
 
-      const scatterFeaturesText = Plot.text(components, 
-        {x: "F1", y: "F2", text: "label"});
-      const scatterFeaturesLines = Plot.link(components, 
-        {x1: 0, y1: 0, x2: "F1", y2: "F2", text: "label"});
-
       const unitCirclePoints = 100;
       const unitCircleCoords =
         Array.from({length: unitCirclePoints}, (v, i) => {
@@ -89,14 +86,16 @@ const Pca: React.FC = () => {
           return [Math.cos(x), Math.sin(x)]
         });
 
-      const unitCircle = Plot.line(unitCircleCoords);
-
       const plot = Plot.plot({
         x: {domain: [-1, 1], grid: true},
         y: {domain: [-1, 1], grid: true},
         width: 400,
         height: 400,
-        marks: [scatterFeaturesText, scatterFeaturesLines, unitCircle]
+        marks: [
+          Plot.text(components, {x: "F1", y: "F2", text: "label"}), 
+          Plot.link(components, {x1: 0, y1: 0, x2: "F1", y2: "F2", text: "label"}),
+          Plot.line(unitCircleCoords)
+        ]
       });
 
       d3.select("#scatter-features").append(() => plot);
