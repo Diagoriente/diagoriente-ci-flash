@@ -10,6 +10,7 @@ export type CiMap<T> = Readonly<{
   update: ([ci, val]: [Ci, T][]) => CiMap<T>;
   size: () => number;
   fromJSON: <T>(rec: Record<string, T>) => CiMap<T>;
+  toJSON: () => Record<number, T>;
 }>;
 
 
@@ -42,6 +43,8 @@ export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> {
   const update = (entries: [Ci, T][]): CiMap<T> =>
     ciMap([...get_entries(), ...entries]);
 
+  const toJSON = () => Object.fromEntries(rec);
+
   const result: CiMap<T> = Object.freeze({
     rec: rec,
     get: get,
@@ -51,6 +54,7 @@ export function ciMap<T>(entries: [ci: Ci, val: T][]): CiMap<T> {
     update: update,
     size: size,
     fromJSON: ciMapFromRecord,
+    toJSON: toJSON,
   });
 
   return result;

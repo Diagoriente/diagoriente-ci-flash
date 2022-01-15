@@ -2,18 +2,12 @@ import { ValidationError } from "utils/helpers/Errors";
 
 export type Ci = { 
   id: number, 
-  toJSON: () => string
+  toJSON: () => number
 };
 
 export const ci = (id: number): Ci => { return {
   id: id,
-  toJSON(): string {
-    if (this === undefined) {
-      return ""
-    } else {
-      return this.id.toString();
-    }
-  },
+  toJSON: () => id,
 }};
 
 export const ciFromString = (s: string | undefined | null): Ci | null => {

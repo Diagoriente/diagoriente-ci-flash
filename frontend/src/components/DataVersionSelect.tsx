@@ -11,8 +11,6 @@ const DataVersionSelect: React.FC<{
 
   const dataVersions = useDataVersions(curDataVersion, onSelect);
 
-  console.log(`DataVersionSelect: curDataVersion is ${curDataVersion}`)
-
   return (
     <div className="text-left">
       <label className="inline" htmlFor="data-version-select">{label}</label>

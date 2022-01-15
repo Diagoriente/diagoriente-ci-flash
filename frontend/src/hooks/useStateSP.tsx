@@ -16,13 +16,11 @@ export function useStateSP<T>(defaultVal: T, paramName: string,
     if (firstRender) {
       setFirstRender(false);
       const searchParamString: string | null = searchParams.get(paramName);
-      console.log(`useStateSP: searchParams.get(${paramName}) = ${searchParamString}`);
       if(searchParamString !== null) {
         const searchParamValueOrNull = decode(searchParamString);
         if (searchParamValueOrNull === null){
           throw Error(`Could not decode query parameter value {paramName}={searchParamString}`);
         } else {
-          console.log(`useStateSP: Setting state of ${paramName} to ${JSON.stringify(searchParamValueOrNull)}`);
           setState(searchParamValueOrNull);
         }
       }
@@ -36,7 +34,6 @@ export function useStateSP<T>(defaultVal: T, paramName: string,
     } else {
       searchParams.set(paramName, encoded);
     }
-    console.log(`useStateSP: searchParams.set(${paramName}) to ${JSON.stringify(encoded)}`);
     setSearchParams(searchParams);
   }, [state, searchParams, setSearchParams, paramName, encode])
 
