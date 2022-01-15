@@ -1,7 +1,9 @@
 import React, {useState} from 'react';
 import {ciSet} from 'utils/helpers/CiSet';
+import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {ciCount} from 'utils/helpers/CiCount';
 import useCiNames from 'hooks/useCiNames';
+import useFetched from "hooks/useFetched";
 import useCisSelected from 'hooks/useCisSelected';
 import useCisSeen from 'hooks/useCisSeen';
 import useDataVersion from 'hooks/useDataVersion';
@@ -16,7 +18,10 @@ export const Reco: React.FC = () => {
   const [cisSelected, addCi, setCisSelected] = useCisSelected();
   const [cisSeen, addCiSeen, setCisSeen] = useCisSeen();
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
-  const ciNames = useCiNames(dataVersion);
+  const [ciNames] = useFetched<CiNames>("ci_names",
+    {ci_data_version: dataVersion},
+    [dataVersion],
+    ciNamesFromRecord);
 
   return (
     <div className="flex space-x-20 items-start">

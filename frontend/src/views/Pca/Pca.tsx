@@ -1,8 +1,8 @@
-import useCiNames from "hooks/useCiNames";
-import useCiAxes from "hooks/useCiAxes";
-import useAxesNames from "hooks/useAxesNames";
-import usePca from "hooks/usePca";
-import React, { useEffect } from 'react';
+import {CiAxes, ciAxesFromRecord} from 'utils/helpers/CiAxes';
+import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
+import useFetched from "hooks/useFetched";
+import React, { useEffect, useMemo } from 'react';
+import {Pca as Pca_} from 'utils/helpers/Pca';
 import useDataVersion from 'hooks/useDataVersion';
 import DataVersionSelect from "components/DataVersionSelect";
 import * as d3 from 'd3';
@@ -12,10 +12,20 @@ import * as Plot from "@observablehq/plot";
 const Pca: React.FC = () => {
 
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
-  const ciNames = useCiNames(dataVersion);
-  const axesNames = useAxesNames(dataVersion);
-  const ciAxes = useCiAxes(dataVersion);
-  const pca = usePca(dataVersion);
+  const [ciNames] = useFetched<CiNames>("ci_names",
+    {ci_data_version: dataVersion},
+    [dataVersion],
+    ciNamesFromRecord);
+  const [axesNames] = useFetched<string[]>("axes_names",
+    {ci_data_version: dataVersion},
+    [dataVersion]);
+  const [ciAxes] = useFetched<CiAxes>("ci_axes",
+    {ci_data_version: dataVersion},
+    [dataVersion],
+    ciAxesFromRecord);
+  const [pca] = useFetched<Pca_>("pca",
+    {ci_data_version: dataVersion},
+    [dataVersion]);
 
   useEffect(() => {
     if (ciAxes !== undefined) {
@@ -74,7 +84,7 @@ const Pca: React.FC = () => {
   [pca]);
 
   useEffect(() => {
-    if (pca !== undefined) {
+    if (pca !== undefined && axesNames !== undefined) {
       const components = pca?.components.map((comp: number[], i: number) => {
           return {label: (axesNames?.[i] || i), F1: comp[0], F2: comp[1]};
       });

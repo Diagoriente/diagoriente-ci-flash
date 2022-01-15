@@ -1,10 +1,12 @@
 import {ci} from "utils/helpers/Ci";
+import {CiScores, ciScoresFromRecord} from "utils/helpers/CiScores";
 import {GraphType, graphTypeFromString, graphTypeToString} from "utils/helpers/GraphType";
-import useCiNames from "hooks/useCiNames";
+import useFetched from "hooks/useFetched";
+import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import useStateSP from "hooks/useStateSP";
 import useCurCi from "hooks/useCurCi";
 import useCiScores from "hooks/useCiScores";
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import * as d3 from 'd3';
 import HorizontalBarChart from "views/VisuScores/HorizontalBarChart";
 import useDataVersion from 'hooks/useDataVersion';
@@ -17,11 +19,20 @@ const VisuScores: React.FC = () => {
     "graphType", graphTypeFromString, graphTypeToString);
   const [curCi, setCurCi] = useCurCi();
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
-  const ciNames = useCiNames(dataVersion);
-  const [ciDist, ciOuv] = useCiScores(curCi, dataVersion, ciNames);
+  const [ciNames] = useFetched<CiNames>("ci_names",
+    {ci_data_version: dataVersion},
+    [dataVersion],
+    ciNamesFromRecord);
+  const [ciScores] = useFetched<CiScores>(
+    "ci_scores",
+    {ci_data_version: dataVersion, ci: curCi},
+    [dataVersion, curCi],
+    ciScoresFromRecord);
 
   useEffect(() => {
     if (curCi !== null && curGraphType !== null && ciNames !== undefined) {
+      const ciDist = ciScores?.distanceAsc(ciNames) || [];
+      const ciOuv = ciScores?.ouvertureDesc(ciNames) || [];
       let xLabel;
       let yDomain;
       let data;
@@ -60,7 +71,7 @@ const VisuScores: React.FC = () => {
         barChart?.remove();
       };
     }
-  }, [curGraphType, curCi, ciDist, ciOuv, ciNames]);
+  }, [curGraphType, curCi, ciScores, ciNames]);
 
   return (
     <div className="flex-col space-y-5">

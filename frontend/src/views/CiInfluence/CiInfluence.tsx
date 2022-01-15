@@ -1,8 +1,7 @@
 import {Ci} from "utils/helpers/Ci";
-import {CiMap} from "utils/helpers/CiMap";
+import {CiMap, ciMapFromRecord} from "utils/helpers/CiMap";
 import useCiInfluence from "hooks/useCiInfluence";
-import useCiCoefsMetiersQuantiles from "hooks/useCiCoefsMetiersQuantiles";
-import useAxesNames from "hooks/useAxesNames";
+import useFetched from "hooks/useFetched";
 import React, { useEffect } from 'react';
 import useDataVersion from 'hooks/useDataVersion';
 import DataVersionSelect from "components/DataVersionSelect";
@@ -13,10 +12,21 @@ import * as Plot from "@observablehq/plot";
 const CiInfluence: React.FC = () => {
 
   const [dataVersion, setDataVersion] = useDataVersion(undefined);
-  const ciCoefsMetiersQuantiles = useCiCoefsMetiersQuantiles(dataVersion,
-    [0.5, 0.75, 0.95, 0.99, 1]);
-  const ciInfluenceSum = useCiInfluence(dataVersion, "sum");
-  const ciInfluenceVar = useCiInfluence(dataVersion, "var");
+  const [ciCoefsMetiersQuantiles] = useFetched<CiMap<number[]>>(
+    "ci_coefs_metiers_quantiles",
+    {ci_data_version: dataVersion, quantiles: [0.5, 0.75, 0.95, 0.99, 1]},
+    [dataVersion],
+    ciMapFromRecord);
+  const [ciInfluenceSum] = useFetched<CiMap<{influence: number, rank: number}>>(
+    "ci_influence",
+    {ci_data_version: dataVersion, method: "sum"},
+    [dataVersion],
+    ciMapFromRecord);
+  const [ciInfluenceVar] = useFetched<CiMap<{influence: number, rank: number}>>(
+    "ci_influence",
+    {ci_data_version: dataVersion, method: "var"},
+    [dataVersion],
+    ciMapFromRecord);
 
   useEffect(() => {
     if (ciCoefsMetiersQuantiles !== undefined && ciInfluenceSum !== undefined && ciInfluenceVar !== undefined ) {

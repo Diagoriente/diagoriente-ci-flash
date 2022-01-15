@@ -1,7 +1,7 @@
 import {CiSet} from "utils/helpers/CiSet";
 import {CiNames} from "utils/helpers/CiNames";
 import React, { useState } from 'react';
-import useMetiersRecommendations from "hooks/useMetiersRecommendations";
+import useFetched from "hooks/useFetched";
 
 
 type PropsType = {
@@ -12,7 +12,9 @@ type PropsType = {
 
 const Metiers: React.FC<PropsType> = props => {
   const [n, setN] = useState<number>(20);
-  const metiers = useMetiersRecommendations(props.cisSelected, n, props.dataVersion);
+  const [metiers] = useFetched<[string, number][]>("metiers_recommend_with_score",
+    {ci_data_version: props.dataVersion, n: n, cis_selected: props.cisSelected},
+    [props.dataVersion, n, props.cisSelected]);
 
   return (
     <div className="rounded p-5 border-4 border-opacity-100 space-y-2">

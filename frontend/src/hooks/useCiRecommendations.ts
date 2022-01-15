@@ -1,8 +1,9 @@
+import {Ci, ci} from "utils/helpers/Ci";
 import {CiSet} from "utils/helpers/CiSet";
 import {CiCount} from "utils/helpers/CiCount";
 import {CiReco, ciReco} from "utils/helpers/CiReco";
 import {useState, useEffect, useCallback} from 'react';
-import {fetchCiRandom, fetchCiReco} from 'services/backend';
+import {fetched} from 'services/backend';
 
 function useCiRecommendations(cisSelected: CiSet, cisSeen: CiCount,
   maxSeen: number, nReco: number, dataVersion: string | undefined) {
@@ -11,21 +12,23 @@ function useCiRecommendations(cisSelected: CiSet, cisSeen: CiCount,
   const drawRandomReco = useCallback(
     () => {
       if (dataVersion !== undefined) {
-        fetchCiRandom(
-          dataVersion, nReco * 3,
-          cisSelected.insert(Array.from(cisSeen.keys()))
-        )
-          .then(cis => {
-            if (cis.length === 0) {
-              console.error("Received 0 random CI from backend.");
-            } else {
-              const cir = ciReco(
-                cis.slice(0, nReco),
-                cis.slice(nReco, nReco * 2),
-                cis.slice(nReco * 2, nReco * 3));
-              setCiRecoState(cir);
-            }
-          });
+        fetched<Ci[]>(
+          "ci_random",
+          { ci_data_version: dataVersion, 
+            n: nReco * 3, 
+            excluding: cisSelected.insert(Array.from(cisSeen.keys())) },
+          (r => r.map(ci)))
+        .then(cis => {
+          if (cis.length === 0) {
+            console.error("Received 0 random CI from backend.");
+          } else {
+            const cir = ciReco(
+              cis.slice(0, nReco),
+              cis.slice(nReco, nReco * 2),
+              cis.slice(nReco * 2, nReco * 3));
+            setCiRecoState(cir);
+          }
+        });
       }
     },
     [dataVersion, nReco, cisSelected]
@@ -36,10 +39,13 @@ function useCiRecommendations(cisSelected: CiSet, cisSeen: CiCount,
       if (cisSelected.size() === 0) {
         drawRandomReco();
       } else {
-        fetchCiReco(dataVersion, nReco, cisSelected, cisSeen, maxSeen)
-          .then(res => {
-            setCiRecoState(res)
-          });
+        fetched<CiReco>(
+          "ci_recommend",
+          { ci_data_version: dataVersion, n: nReco, max_seen: maxSeen, 
+            cis_selected: cisSelected, cis_seen: cisSeen },
+          ( r: { proches: number[], ouverture: number[], distant: number[]}) =>
+            ciReco(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci)) )
+        .then(setCiRecoState);
       }
     }
   }, [cisSelected, cisSeen, maxSeen, nReco, dataVersion]);
