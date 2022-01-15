@@ -53,7 +53,7 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
     unexpected_ci_names = ci_names_set - expected_ci_names_set
     if len(unexpected_ci_names) > 0:
         raise ValueError(f"Found unexpected CIs in Métiers CSV file " +
-            "{path}: {unexpected_ci_names}.")
+            f"{path}: {unexpected_ci_names}.")
 
     missing_ci_names = expected_ci_names_set - ci_names_set
     if len(missing_ci_names) > 0:
