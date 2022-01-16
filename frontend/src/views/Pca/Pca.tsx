@@ -28,9 +28,9 @@ const Pca: React.FC = () => {
     [dataVersion]);
 
   useEffect(() => {
-    if (ciAxes !== undefined) {
-      const data = ciAxes?.entries().map(([_, axes]) => {
-          return {F1: axes[0], F2: axes[1]};
+    if (ciAxes !== undefined && ciNames !== undefined) {
+      const data = ciAxes?.entries().map(([ci, axes]) => {
+          return {F1: axes[0], F2: axes[1], label: ciNames.get(ci)};
       });
 
       const [dmin, dmax] = data.reduce(
@@ -42,12 +42,12 @@ const Pca: React.FC = () => {
       );
 
       const plot = Plot.plot({
-        width: 400,
-        height: 400,
+        width: 1000,
+        height: 1000,
         x: {domain: [dmin, dmax], grid: true},
         y: {domain: [dmin, dmax], grid: true},
         marks: [
-          Plot.dot(data, {x: "F1", y: "F2"})
+          Plot.text(data, {x: "F1", y: "F2", text: "label"}), 
         ]
       });
 
@@ -58,7 +58,7 @@ const Pca: React.FC = () => {
       };
     }
   },
-  [ciAxes]);
+  [ciAxes, ciNames]);
 
   useEffect(() => {
     if (pca !== undefined) {
@@ -127,25 +127,23 @@ const Pca: React.FC = () => {
         curDataVersion={dataVersion}
         onSelect={setDataVersion}
       />
-      <div className="flex flex-wrap items-baseline">
+      <div className="flex flex-wrap items-baseline justify-center">
         <figure className="w-96 m-4">
           <div id="scree-plot" className="flex justify-center"></div>
           <figcaption className="flex justify-center text-justify">Éboulis (scree
           plot). Proportion de variance expliquée par chaque composante
           principale.</figcaption>
         </figure>
-        <div className="flex space-x-8 items-baseline">
-          <figure className="w-96 m-4">
-            <div id="scatter-ci" className="flex justify-center"></div>
-            <figcaption className="flex justify-center text-justify">Nuage des centres
-            d'intérêts dans le plan principal. Centres d'intérets projetés dans le plan des 2 premières 
-            composantes principales</figcaption>
-          </figure>
-          <figure className="w-96 m-4">
-            <div id="scatter-features" className="flex justify-center"></div>
-            <figcaption className="flex justify-center text-justify">Cercle des corrélations</figcaption>
-          </figure>
-        </div>
+        <figure className="w-96 m-4">
+          <div id="scatter-features" className="flex justify-center"></div>
+          <figcaption className="flex justify-center text-justify">Cercle des corrélations</figcaption>
+        </figure>
+        <figure className="w-full m-4">
+          <div id="scatter-ci" className="flex justify-center"></div>
+          <figcaption className="flex justify-center text-justify">Nuage des centres
+          d'intérêts dans le plan principal. Centres d'intérets projetés dans le plan des 2 premières 
+          composantes principales</figcaption>
+        </figure>
       </div>
     </div>
   );
