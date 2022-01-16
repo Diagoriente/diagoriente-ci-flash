@@ -1,9 +1,11 @@
-import {Ci} from "utils/helpers/Ci";
+import {Ci, ci} from "utils/helpers/Ci";
 import {CiSet} from "utils/helpers/CiSet";
 import {CiCount} from "utils/helpers/CiCount";
 import {CiNames} from "utils/helpers/CiNames";
+import {CiReco, ciReco as ciReco_} from "utils/helpers/CiReco";
 import React from 'react';
-import useCiRecommendations from 'hooks/useCiRecommendations';
+import useFetched from 'hooks/useFetched';
+import useReShuffle from 'hooks/useReShuffle';
 import CiRecommendationList from 'components/CiRecommendationList';
 
 
@@ -23,10 +25,21 @@ type StepPropsType = {
 const Step: React.FC<StepPropsType> = ({onSelectCi, onRestart, onAddCiSeen, cisSelected, cisSeen,
   maxSeen, nReco, ciNames, dataVersion}) => {
 
-  const [ciRecoState, reShuffle] = useCiRecommendations(cisSelected, cisSeen,
-    maxSeen, nReco, dataVersion);
+  const [ciReco, setCiReco] = useFetched<CiReco>(
+    "ci_recommend",
+    {
+      ci_data_version: dataVersion, n: nReco, max_seen: maxSeen,
+      cis_selected: cisSelected, cis_seen: cisSeen
+    },
+    [dataVersion, nReco, maxSeen, cisSelected, cisSeen],
+    (r: {proches: number[], ouverture: number[], distant: number[]}) =>
+      ciReco_(r.proches.map(ci), r.ouverture.map(ci), r.distant.map(ci))
+  );
 
-  if (ciRecoState === undefined || ciNames === undefined) {
+  const reShuffle = useReShuffle(cisSelected, cisSeen,
+    maxSeen, nReco, dataVersion, setCiReco);
+
+  if (ciReco === undefined || ciNames === undefined) {
     return <p>Chargement…</p>;
   } else {
 
@@ -68,22 +81,22 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, onRestart, onAddCiSeen, cisS
             <CiRecommendationList 
               onSelect={(ci: Ci) => {
                 onSelectCi(ci);
-                const seen = [...ciRecoState.ciClose, ...ciRecoState.ciOpening,
-                ...ciRecoState.ciDistant];
+                const seen = [...ciReco.ciClose, ...ciReco.ciOpening,
+                ...ciReco.ciDistant];
                 console.log("ONADDCISEEN " + JSON.stringify(seen.map((ci: Ci) => [ci.id.toString(), ciNames.get(ci)])));
                 onAddCiSeen(seen);
               }}
-              items={ciRecoState.ciClose} ciNames={ciNames}/>
+              items={ciReco.ciClose} ciNames={ciNames}/>
           </div>
           <div className="w-1/3 space-y-4">
             <p className="text-center">(ouverture)</p>
             <CiRecommendationList onSelect={onSelectCi}
-              items={ciRecoState.ciOpening} ciNames={ciNames}/>
+              items={ciReco.ciOpening} ciNames={ciNames}/>
           </div>
           <div className="w-1/3 space-y-4">
             <p className="text-center">(distants)</p>
             <CiRecommendationList onSelect={onSelectCi}
-              items={ciRecoState.ciDistant} ciNames={ciNames}/>
+              items={ciReco.ciDistant} ciNames={ciNames}/>
           </div>
         </div>
         <div>

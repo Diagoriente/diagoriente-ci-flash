@@ -45,6 +45,9 @@ class CiSelection:
             raise TypeError(f"list indices must be integers or slices, not " +
                             f"{type(key)}")
 
+    def __len__(self) -> int:
+        return len(self.ids)
+
     def __iter__(self) -> Iterator[CiId]:
         return iter(self.ids)
 
@@ -145,33 +148,42 @@ def ci_ouverture(ci_set: CiSet, preferences: Model) -> CiSelection:
     return CiSelection.from_ints(ids_list)
 
 
-def ci_recommend(n: int, ci_selected: CiSelection, ci_seen: dict[CiId, int],
-                 max_seen: int, ci_set: CiSet) \
-        -> Tuple[CiSelection, CiSelection, CiSelection]:
-
-    preferences = approximate_preferences(ci_set.select(ci_selected))
+def ci_recommend(n: int, ci_selected: CiSelection, ci_seen: dict[CiId, int], max_seen: int, ci_set: CiSet) -> Tuple[CiSelection, CiSelection, CiSelection]:
 
     exclude = ci_selected.union(CiSelection(
         ids=[ci for ci, count in ci_seen.items() if count >= max_seen]))
 
-    ci_by_proximity: CiSelection = CiSelection(ids=[ci for ci in ci_proches(ci_set, preferences)
-                                                    if not exclude.contains(ci)])
-    proches = ci_by_proximity[:n]
+    if len(ci_selected) == 0:
 
-    exclude = exclude.union(proches)
+        cis = ci_random(n * 3, ci_set, excluding = exclude)
+        proches = cis[0:n]
+        ouv = cis[n:n*2]
+        distants = cis[n*2:n*3]
 
-    ouv = CiSelection(ids=[ci for ci in ci_ouverture(ci_set, preferences)
-                           if not exclude.contains(ci)][:n])
+    else :
 
-    exclude = exclude.union(ouv)
+        preferences = approximate_preferences(ci_set.select(ci_selected))
 
-    distants_list: list[CiId] = []
-    for ci in reversed(ci_by_proximity.ids):
-        if len(distants_list) < n:
-            if not exclude.contains(ci):
-                distants_list.append(ci)
-        else:
-            break
-    distants = CiSelection(ids=distants_list)
+        ci_by_proximity: CiSelection = CiSelection(
+            ids=[ci for ci in ci_proches(ci_set, preferences)
+                 if not exclude.contains(ci)])
+
+        proches = ci_by_proximity[:n]
+
+        exclude_proches = exclude.union(proches)
+
+        ouv = CiSelection(ids=[ci for ci in ci_ouverture(ci_set, preferences)
+                               if not exclude_proches.contains(ci)][:n])
+
+        exclude_proches_ouv = exclude_proches.union(ouv)
+
+        distants_list: list[CiId] = []
+        for ci in reversed(ci_by_proximity.ids):
+            if len(distants_list) < n:
+                if not exclude_proches_ouv.contains(ci):
+                    distants_list.append(ci)
+            else:
+                break
+        distants = CiSelection(ids=distants_list)
 
     return (proches, ouv, distants)
