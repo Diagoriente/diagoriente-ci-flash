@@ -1,6 +1,5 @@
 import {Ci} from "utils/helpers/Ci";
 import {CiMap, ciMapFromRecord} from "utils/helpers/CiMap";
-import useCiInfluence from "hooks/useCiInfluence";
 import useFetched from "hooks/useFetched";
 import React, { useEffect } from 'react';
 import useDataVersion from 'hooks/useDataVersion';

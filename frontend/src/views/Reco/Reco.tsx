@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {ciSet} from 'utils/helpers/CiSet';
 import {CiNames, ciNamesFromRecord} from 'utils/helpers/CiNames';
 import {ciCount} from 'utils/helpers/CiCount';
-import useCiNames from 'hooks/useCiNames';
 import useFetched from "hooks/useFetched";
 import useCisSelected from 'hooks/useCisSelected';
 import useCisSeen from 'hooks/useCisSeen';

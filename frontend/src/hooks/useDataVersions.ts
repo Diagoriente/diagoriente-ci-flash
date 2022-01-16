@@ -1,22 +1,18 @@
-import {useState, useEffect} from 'react';
-import {fetchDataVersions} from 'services/backend';
+import {useEffect} from 'react';
+import useFetched from 'hooks/useFetched';
 import {DataVersions} from 'utils/helpers/DataVersions';
 
 
 function useDataVersions(curDataVersion: string | undefined,
     setDataVersion: (dataVersions: string) => void) {
-  const [dataVersions, setDataVersions] = useState<DataVersions | undefined>(undefined);
+  const [dataVersions] = useFetched<DataVersions>("ci_data_versions");
 
   useEffect((): void => {
-    fetchDataVersions()
-    .then(dataVersions => {
-      setDataVersions(dataVersions);
-
-      if (dataVersions.list.find((item) => item === curDataVersion) === undefined) {
-        setDataVersion(dataVersions.default);
-      }
-    })
-  }, [curDataVersion, setDataVersion]);
+    if (dataVersions !== undefined &&
+        dataVersions.list.find((item) => item === curDataVersion) === undefined) {
+      setDataVersion(dataVersions.default);
+    }
+  }, [dataVersions, curDataVersion, setDataVersion]);
 
   return dataVersions; // see https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/hooks/#custom-hooks
 };

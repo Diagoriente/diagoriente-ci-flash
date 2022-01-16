@@ -1,11 +1,11 @@
-import {useState, useEffect, useRef, useMemo} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import {fetched} from "services/backend";
 
 
 function useFetched<T>(
   path: string,
-  params: Record<string, number | string | boolean | object | undefined>,
-  dependencies: any[],
+  params: Record<string, number | string | boolean | object | undefined> = {},
+  dependencies: any[] = [],
   cons: (r: any) => T = r => r,
 ) {
 
