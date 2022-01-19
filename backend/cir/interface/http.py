@@ -1,11 +1,10 @@
 from cir import constants
 from cir.core import model, stats
-import cir.interface.csv as csv
-from cir.util import DataSet
+import cir.util.data as data
+from cir.util.data import DataSet, DataSetName
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
-from pathlib import Path
 from typing import Optional
 from pydantic import BaseModel
 from dataclasses import dataclass
@@ -22,44 +21,38 @@ app.add_middleware(
 
 
 def pass_ci_id_or_raise(dataset: DataSet, i: int, msg: str) -> None:
-    ci_set = csv.get_ci_set(dataset)
+    ci_set = data.get_ci_set(dataset)
     if i < 0 or i >= ci_set.size():
         raise HTTPException(status_code=422, detail=msg)
 
 
-class DataVersions(BaseModel):
-    default: Path
-    list: list[Path]
-
-
 @app.get("/axes_names")
 async def get_axes_names(
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[DataSetName] = None
         ) -> list[str]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    axes_names = csv.get_axes_names(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    axes_names = data.get_axes_names(dataset)
     return axes_names
 
 
 @app.get("/ci_axes")
 async def get_ci_axes(
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[DataSetName] = None
         ) -> dict[int, list[np.float64]]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    return dict(enumerate(csv.get_ci_set(dataset).axes.tolist()))
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    return dict(enumerate(data.get_ci_set(dataset).axes.tolist()))
+
+
+class DataVersions(BaseModel):
+    default: DataSetName
+    list: list[DataSetName]
 
 
 @app.get("/ci_data_versions")
 async def get_ci_data_versions() -> DataVersions:
     return DataVersions(
-            default=constants.DEFAULTCOEFDATAFILE,
-            list=sorted([d.ci_path for d in csv.datasets])
+            default=DataSetName(constants.DEFAULTDATASET),
+            list=[d for d in data.datasets.keys()]
     )
 
 
@@ -71,30 +64,24 @@ class CiInfluenceOut:
 
 @app.get("/ci_influence")
 async def get_ci_influence(
-        ci_data_version: Optional[Path] = None,
+        ci_data_version: Optional[data.DataSetName] = None,
         method: stats.CiInfluenceMethod = stats.CiInfluenceMethod.SUM
         ) -> dict[int, CiInfluenceOut]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    metiers = csv.get_metiers(dataset)
-    ci_ids: list[model.CiId] = csv.get_ci_set(dataset).ids.ids
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    metiers = data.get_metiers(dataset)
+    ci_ids: list[model.CiId] = data.get_ci_set(dataset).ids.ids
     infl, rank = stats.ci_influence(metiers, method = method)
     return {ci_id.val: CiInfluenceOut(influence=float(infl), rank=int(r)) for ci_id, infl,r in zip(ci_ids, infl, rank)}
 
 
 @app.post("/ci_coefs_metiers_quantiles")
 async def get_ci_coefs_metiers_quantiles(
-        ci_data_version: Optional[Path] = None,
+        ci_data_version: Optional[data.DataSetName] = None,
         quantiles: list[float] = [0.25, 0.5, 0.75]
         ) -> dict[int, list[float]]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    metiers = csv.get_metiers(dataset)
-    ci_ids: list[int] = [x.val for x in csv.get_ci_set(dataset).ids.ids]
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    metiers = data.get_metiers(dataset)
+    ci_ids: list[int] = [x.val for x in data.get_ci_set(dataset).ids.ids]
     result: list[list[float]] = stats.ci_coefs_metiers_quantiles(metiers, quantiles = quantiles).tolist()
     return dict(zip(ci_ids, result))
 
@@ -102,13 +89,10 @@ async def get_ci_coefs_metiers_quantiles(
 
 @app.get("/ci_names")
 async def get_ci_names(
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[data.DataSetName] = None
         ) -> dict[int, str]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_names = csv.get_ci_names(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_names = data.get_ci_names(dataset)
     return dict(enumerate(ci_names))
 
 
@@ -116,13 +100,10 @@ async def get_ci_names(
 async def ci_random(
         n: int,
         selected_cis: list[int],
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[data.DataSetName] = None
         ) -> list[int]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_set = csv.get_ci_set(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_set = data.get_ci_set(dataset)
     pass_ci_id_or_raise(dataset, n,
             f"Query parameter 'n' must be a integer between 0 and " +
                     f"{ci_set.size() - 1} included.")
@@ -137,13 +118,10 @@ async def ci_recommend(
         cis_selected: list[int],
         cis_seen: dict[int, int], 
         max_seen: int,
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[data.DataSetName] = None
         ) -> dict[str, list[int]]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_set = csv.get_ci_set(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_set = data.get_ci_set(dataset)
     pass_ci_id_or_raise(dataset, n,
                         f"Query parameter 'n' must be a integer between 0 and " +
                         f"{ci_set.size() - 1} included.")
@@ -176,13 +154,10 @@ async def ci_recommend(
 @app.get("/ci_scores")
 async def ci_scores(
         ci: int,
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[data.DataSetName] = None
         ) -> dict[int, dict[str,float]]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_set = csv.get_ci_set(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_set = data.get_ci_set(dataset)
     pref = model.approximate_preferences(ci_set.select(model.CiSelection.from_ints([ci])))
     score_distance = model.prox(ci_set, pref)
     score_ouv = model.ouv(ci_set, pref)
@@ -197,38 +172,31 @@ async def ci_scores(
 async def metiers_recommend(
         n: int,
         cis_selected: list[int],
-        ci_data_version: Optional[Path] = None
+        ci_data_version: Optional[data.DataSetName] = None
         ) -> list[str]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_names = csv.get_ci_names(dataset)
-    metiers = csv.get_metiers(dataset)
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_names = data.get_ci_names(dataset)
+    metiers = data.get_metiers(dataset)
 
-    return metiers.recommend(model.CiSelection.from_ints(cis_selected), 
-            ci_names, n)
+    return metiers.recommend_rome(model.CiSelection.from_ints(cis_selected), ci_names, n)
 
 
 @app.post("/metiers_recommend_with_score")
 async def metiers_recommend_with_score(
         n: int,
         cis_selected: list[int],
-        ci_data_version: Optional[Path] = None
-        ) -> list[tuple[str, np.float64]]:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    ci_names = csv.get_ci_names(dataset)
-    metiers = csv.get_metiers(dataset)
+        ci_data_version: Optional[data.DataSetName] = None
+        ) -> list[tuple[str, str, np.float64]]:
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    ci_names = data.get_ci_names(dataset)
+    metiers = data.get_metiers(dataset)
 
-    return metiers.recommend_with_score(
-            model.CiSelection.from_ints(cis_selected), ci_names, n)
+    return metiers.recommend(model.CiSelection.from_ints(cis_selected), ci_names, n)
 
 
 @dataclass
 class PcaOut:
+    variables_names: list[str]
     components: list[list[np.float64]]
     explained_variance: list[list[np.float64]]
     explained_variance_ratio: list[np.float64]
@@ -236,18 +204,19 @@ class PcaOut:
 
 @app.get("/pca")
 async def get_pca(
-        ci_data_version: Optional[Path] = None
-        ) -> PcaOut:
-    dataset = DataSet(
-            ci_path = ci_data_version or constants.DEFAULTCOEFDATAFILE,
-            metiers_path=constants.METIERS_COEF_FILE
-    )
-    pca = csv.get_pca(dataset)
-    return PcaOut(
-        components = pca.components.tolist(),
-        explained_variance = pca.explained_variance.tolist(),
-        explained_variance_ratio=pca.explained_variance_ratio.tolist(),
-        kaiser_criteria=pca.kaiser_criteria
-    )
+        ci_data_version: Optional[data.DataSetName] = None
+        ) -> Optional[PcaOut]:
+    dataset = data.datasets[ci_data_version or DataSetName(constants.DEFAULTDATASET)]
+    pca = data.get_pca(dataset)
+    if pca == None:
+        return None
+    else:
+        return PcaOut(
+            variables_names = pca.variables_names,
+            components = pca.components.tolist(),
+            explained_variance = pca.explained_variance.tolist(),
+            explained_variance_ratio=pca.explained_variance_ratio.tolist(),
+            kaiser_criteria=pca.kaiser_criteria
+        )
 
 

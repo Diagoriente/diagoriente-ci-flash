@@ -1,18 +1,12 @@
-from cir import constants
 import csv
 import numpy as np
 import numpy.typing as npt
-import os
 
 from pathlib import Path
-from cir.core.model import CiSet
-from cir.core.metiers import Metiers
-from cir.core.stats import Pca
-from cir.util import DataSet
 from typing import Tuple
 
 
-def ci_set_from_csv(path: Path) -> Tuple[list[str], list[str], CiSet, Pca]:
+def ci_set_from_csv(path: Path) -> Tuple[list[str], list[str], npt.NDArray[np.float64]]:
     with open(path) as f:
         data = list(csv.reader(f))
 
@@ -29,23 +23,16 @@ def ci_set_from_csv(path: Path) -> Tuple[list[str], list[str], CiSet, Pca]:
                 f"{row}")
     values_arr = np.array(values, dtype=np.float64)
 
-    projected, pca = Pca.from_values(values_arr)
-
-    n_axes = values_arr.shape[1]
-
-    return ci_names, axes_names, CiSet.from_ndarray(projected, n_axes), pca
+    return ci_names, axes_names, values_arr
 
 
-def data_version_from_path(p: str) -> str:
-    return os.path.splitext(os.path.basename(p))[0]
-
-
-def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
+def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Tuple[list[str], list[str], npt.NDArray[np.float64]]:
     with open(path) as f:
         data = list(csv.reader(f))
 
     metiers_names = [row[0] for row in data[1:]]
-    ci_names = data[0][2:]
+    metiers_rome = [row[4] for row in data[1:]]
+    ci_names = data[0][5:]
 
     expected_ci_names_set = set(expected_ci_names)
     ci_names_set = set(ci_names)
@@ -66,7 +53,7 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
     values: list[npt.NDArray[np.float64]] = []
     for i, row in enumerate(data[1:]):
         try:
-            clean = [np.nan if x == '' else np.float64(x) for x in row[2:] ]
+            clean = [np.nan if x == '' else np.float64(x) for x in row[5:] ]
             values.append(np.array(clean, dtype=np.float64))
         except ValueError as e:
             raise ValueError(
@@ -79,10 +66,12 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
     keep = np.isnan(values_arr).sum(axis=1) < values_arr.shape[1]
     values_arr = values_arr[keep, :]
     metiers_names = [x for x, k in zip(metiers_names, keep) if k]
+    metiers_rome = [x for x, k in zip(metiers_rome, keep) if k]
 
     # Treat remaining nan values as 0.
     values_arr[np.isnan(values_arr)] = 0
 
+    # Reorder columns so that they respect the orders in ci_names
     reordered: npt.NDArray[np.float64] = np.empty(values_arr.shape) * np.nan
     for i, ci_name in enumerate(ci_names):
         try:
@@ -92,59 +81,6 @@ def metiers_from_csv(path: Path, expected_ci_names: list[str]) -> Metiers:
            raise ValueError(f"Unexpected CI name in Métiers CSV file {path}: " +
                    "{ci_name}. Cause: {e}")
 
-    return Metiers(names = metiers_names, coefficients = reordered)
+    return metiers_names, metiers_rome, reordered
 
 
-ci_names_dict: dict[DataSet, list[str]] = {}
-axes_names_dict: dict[DataSet, list[str]] = {}
-ci_set_dict: dict[DataSet, CiSet] = {}
-metiers_dict: dict[DataSet, Metiers] = {}
-pca_dict: dict[DataSet, Pca] = {}
-
-
-def get_axes_names(dataset: DataSet) -> list[str]:
-    _, axes_names, _, _ = get_ci_names_and_set(dataset)
-    return axes_names
-
-
-def get_ci_names(dataset: DataSet) -> list[str]:
-    ci_names, _, _, _ = get_ci_names_and_set(dataset)
-    return ci_names
-
-
-def get_ci_set(dataset: DataSet) -> CiSet:
-    _, _, ci_set, _ = get_ci_names_and_set(dataset)
-    return ci_set
-
-
-def get_pca(dataset: DataSet) -> Pca:
-    _, _, _, pca = get_ci_names_and_set(dataset)
-    return pca
-
-
-
-def get_ci_names_and_set(dataset: DataSet) -> tuple[list[str], list[str], CiSet, Pca]:
-    if dataset not in ci_set_dict:
-        ci_names, axes_names, ci_set, pca = ci_set_from_csv(Path(dataset.ci_path))
-        ci_names_dict[dataset] = ci_names
-        axes_names_dict[dataset] = axes_names
-        ci_set_dict[dataset] = ci_set
-        pca_dict[dataset] = pca
-    return ci_names_dict[dataset], axes_names_dict[dataset], ci_set_dict[dataset], pca_dict[dataset]
-
-
-def get_metiers(dataset: DataSet) -> Metiers:
-    if dataset not in metiers_dict:
-        ci_names = get_ci_names(dataset)
-        metiers_dict[dataset] = metiers_from_csv(dataset.metiers_path,
-                ci_names)
-    return metiers_dict[dataset]
-
-
-datasets: list[DataSet] = [
-    DataSet(
-        ci_path=Path(f),
-        metiers_path=constants.METIERS_COEF_FILE
-    )
-    for f in os.scandir(constants.COEFDATAFOLDER)
-]

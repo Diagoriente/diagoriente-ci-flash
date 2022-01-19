@@ -16,9 +16,6 @@ const Pca: React.FC = () => {
     {ci_data_version: dataVersion},
     [dataVersion],
     ciNamesFromRecord);
-  const [axesNames] = useFetched<string[]>("axes_names",
-    {ci_data_version: dataVersion},
-    [dataVersion]);
   const [ciAxes] = useFetched<CiAxes>("ci_axes",
     {ci_data_version: dataVersion},
     [dataVersion],
@@ -84,9 +81,9 @@ const Pca: React.FC = () => {
   [pca]);
 
   useEffect(() => {
-    if (pca !== undefined && axesNames !== undefined) {
+    if (pca !== undefined) {
       const components = pca?.components.map((comp: number[], i: number) => {
-          return {label: (axesNames?.[i] || i), F1: comp[0], F2: comp[1]};
+          return {label: (pca?.variables_names[i] || i), F1: comp[0], F2: comp[1]};
       });
 
       const unitCirclePoints = 100;
@@ -115,7 +112,7 @@ const Pca: React.FC = () => {
       };
     }
   },
-  [pca, axesNames]);
+  [pca]);
 
   return (
     <div>

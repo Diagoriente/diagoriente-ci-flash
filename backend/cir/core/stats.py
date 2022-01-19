@@ -9,13 +9,14 @@ from cir.core.metiers import Metiers
 
 @dataclass(frozen=True)
 class Pca:
+    variables_names: list[str]
     components: npt.NDArray[np.float64]
     explained_variance: npt.NDArray[np.float64]
     explained_variance_ratio: npt.NDArray[np.float64]
     kaiser_criteria: float
 
     @staticmethod
-    def from_values(values: npt.NDArray[np.float64]) -> tuple[npt.NDArray[np.float64], "Pca"]:
+    def from_values(values: npt.NDArray[np.float64], variables_names: list[str]) -> tuple[npt.NDArray[np.float64], "Pca"]:
         no_nan = np.copy(values)
         no_nan[np.isnan(no_nan)] = 0
         scaled = scale(no_nan)
@@ -24,6 +25,7 @@ class Pca:
         projected: npt.NDArray[np.float64] = sk_pca.fit_transform(scaled)
 
         pca = Pca(
+            variables_names = variables_names,
             components = sk_pca.components_,
             explained_variance = sk_pca.explained_variance_,
             explained_variance_ratio = sk_pca.explained_variance_ratio_,

@@ -12,7 +12,7 @@ type PropsType = {
 
 const Metiers: React.FC<PropsType> = props => {
   const [n, setN] = useState<number>(20);
-  const [metiers] = useFetched<[string, number][]>("metiers_recommend_with_score",
+  const [metiers] = useFetched<[string, string, number][]>("metiers_recommend_with_score",
     {ci_data_version: props.dataVersion, n: n, cis_selected: props.cisSelected},
     [props.dataVersion, n, props.cisSelected]);
 
@@ -32,8 +32,8 @@ const Metiers: React.FC<PropsType> = props => {
         </h2>
       </div>
       <ol className="list-decimal list-outside ml-10">
-      {metiers?.map(([name, score]: [string, number]) => 
-        <li key={name}>{name} (score: {score})</li>
+      {metiers?.map(([rome, name, score]: [string, string, number]) => 
+        <li key={rome}>{rome} : {name} (score: {score})</li>
       )}
       </ol>
     </div>

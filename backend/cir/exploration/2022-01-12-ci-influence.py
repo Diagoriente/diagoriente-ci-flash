@@ -4,7 +4,7 @@ import scipy as sp
 import pandas as pa
 from pathlib import Path
 from cir.interface import csv
-from cir.util import DataSet
+from cir.util.data import DataSet
 
 dataset = DataSet(
         ci_path=Path("data/cotations/2022-11-26b_Cotations CI - Coefficients aggrégés - Sans Thématique-Identité.csv"),

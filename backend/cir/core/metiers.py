@@ -7,6 +7,7 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Metiers:
     names: list[str]
+    rome: list[str]
     coefficients: npt.NDArray[np.float64]
 
     def scores(self, cis_selected: CiSelection, ci_names: list[str]) -> npt.NDArray[np.float64]:
@@ -17,23 +18,23 @@ class Metiers:
         return np.asarray(res).flatten()
 
 
-    def recommend(self, cis_selected: CiSelection, ci_names: list[str], n: int) -> list[str]:
+    def recommend_rome(self, cis_selected: CiSelection, ci_names: list[str], n: int) -> list[str]:
         scores = self.scores(cis_selected, ci_names)
         recommended_metiers_ids = sorted(
                 range(len(self.names)),
                 key = lambda i: scores[i], 
                 reverse=True
                 )[:n]
-        recommended_metiers_names = [self.names[i] for i in recommended_metiers_ids]
-        return recommended_metiers_names
+        recommended_metiers_rome = [self.rome[i] for i in recommended_metiers_ids]
+        return recommended_metiers_rome
 
 
-    def recommend_with_score(self, cis_selected: CiSelection, ci_names: list[str], n: int) -> list[tuple[str, np.float64]]:
+    def recommend(self, cis_selected: CiSelection, ci_names: list[str], n: int) -> list[tuple[str, str, np.float64]]:
         scores = self.scores(cis_selected, ci_names)
         recommended_metiers_ids = sorted(
                 range(len(self.names)),
                 key = lambda i: scores[i], 
                 reverse=True
                 )[:n]
-        recommended_metiers = [(self.names[i], scores[i]) for i in recommended_metiers_ids]
+        recommended_metiers = [(self.rome[i], self.names[i], scores[i]) for i in recommended_metiers_ids]
         return recommended_metiers

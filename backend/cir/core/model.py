@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 
-from cir.util import rg
+from cir.util.random import rg
 from dataclasses import dataclass
 from typing import overload, Tuple, Union, Iterator
 
