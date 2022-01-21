@@ -95,19 +95,19 @@ def get_metiers_data(dataset: DataSet[Any, M]) -> tuple[Metiers, M]:
 
 
 class DataSetName(Enum):
-    _6_AXES_ACP = "6 Axes ACP"
-    _7_AXES_ACP = "7 Axes ACP"
+    _2021_11_26b_6_AXES_ACP = "2021-11-26b 6 Axes ACP"
+    _2022_01_21b_6_AXES_ACP = "2022-01-21b 6 Axes ACP"
 
 
 datasets: dict[DataSetName, DataSet] = {
-        DataSetName._6_AXES_ACP: DataSet(
+        DataSetName._2021_11_26b_6_AXES_ACP: DataSet(
             ci_path = Path("data/cotations/2021-11-26b_Cotations CI - Coefficients aggrégés - Sans Thématique-Identité.csv"),
             metiers_path = Path("data/métiers/Métiers CI correctifs du 23_11_21.csv"),
             ci_preprocessing = pca,
             metiers_preprocessing = no_preprocessing,
         ),
-        DataSetName._7_AXES_ACP: DataSet(
-            ci_path = Path("data/cotations/2021-11-26_Cotations CI - Coefficients aggrégés.csv"),
+        DataSetName._2022_01_21b_6_AXES_ACP: DataSet(
+            ci_path = Path("data/cotations/2022-01-21b_Cotations CI - Coefficients aggrégés - Sans Thématique-Identité.csv"),
             metiers_path = Path("data/métiers/Métiers CI correctifs du 23_11_21.csv"),
             ci_preprocessing = pca,
             metiers_preprocessing = no_preprocessing,

@@ -24,7 +24,6 @@ services:
             PYTHONPATH: /app/backend/
             COEFDATAFOLDER: $COEFDATAFOLDER
             DEFAULTDATASET: $DEFAULTDATASET
-            METIERS_COEF_FILE: $METIERS_COEF_FILE
         restart: unless-stopped
         ports:
            - 8000:8000
