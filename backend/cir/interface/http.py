@@ -9,11 +9,12 @@ from typing import Optional
 from pydantic import BaseModel
 from dataclasses import dataclass
 
-app = FastAPI()
+app = FastAPI(root_path=constants.API_ROOT_PATH)
+
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=constants.FRONTEND_URL,
+    allow_origins=constants.CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -1,4 +1,3 @@
-import {BACKEND_URL} from 'utils/constants';
 import {throwNetworkError, jsonOrThrowHttpError} from 'utils/helpers/Requests';
 
 type HttpParamValue = 
@@ -39,7 +38,7 @@ export async function fetched<T>(
   endpoint: string,
   params: Record<string, number | string | boolean | object> = {},
   cons: ((r: any) => T) = r => r): Promise<T> {
-  const req = new URL(BACKEND_URL + endpoint)
+  const req = new URL(window.location.origin + "/api/" + endpoint)
 
   type Acc = {
     queryParams: {name: string, value: HttpQueryParamValue}[],

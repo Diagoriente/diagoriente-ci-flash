@@ -1,31 +1,28 @@
 version: '3.3'
 services:
     frontend:
+        image: $COMPOSE_PROJECT_NAME/frontend:$VERSION
         build:
-            context: ./
+            context: ../
             dockerfile: docker/frontend/Dockerfile
-            args:
-                REACT_APP_BACKEND_URL: $BACKEND_URL
-                REACT_APP_STATIC_URL: $STATIC_URL
         ports:
-           - 3000:3000
+           - $FRONTEND_PORT:3000
         depends_on:
             - backend
         restart: unless-stopped
-        environment:
-            BACKEND_URL: $BACKEND_URL
-            STATIC_URL: $STATIC_URL
     backend:
+        image: $COMPOSE_PROJECT_NAME/backend:$VERSION
         build:
-            context: ./
+            context: ../
             dockerfile: docker/backend/Dockerfile
         environment:
-            FRONTEND_URL: $FRONTEND_URL
+            CORS_ALLOWED_ORIGINS: $CORS_ALLOWED_ORIGINS
+            API_ROOT_PATH: $API_ROOT_PATH
             PYTHONPATH: /app/backend/
             COEFDATAFOLDER: $COEFDATAFOLDER
             DEFAULTDATASET: $DEFAULTDATASET
         restart: unless-stopped
         ports:
-           - 8000:8000
+           - $BACKEND_PORT:8000
 
 

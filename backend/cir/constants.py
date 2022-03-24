@@ -16,6 +16,7 @@ except:
     RNGSEED = None
 COEFDATAFOLDER: Path = Path(getenv_checked("COEFDATAFOLDER"))
 DEFAULTDATASET: str = getenv_checked("DEFAULTDATASET")
-FRONTEND_URL = getenv_checked("FRONTEND_URL").split()
+CORS_ALLOWED_ORIGINS = getenv_checked("CORS_ALLOWED_ORIGINS").split()
+API_ROOT_PATH = getenv_checked("API_ROOT_PATH") or "/"
 
 

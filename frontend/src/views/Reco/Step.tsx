@@ -83,7 +83,6 @@ const Step: React.FC<StepPropsType> = ({onSelectCi, onRestart, onAddCiSeen, cisS
                 onSelectCi(ci);
                 const seen = [...ciReco.ciClose, ...ciReco.ciOpening,
                 ...ciReco.ciDistant];
-                console.log("ONADDCISEEN " + JSON.stringify(seen.map((ci: Ci) => [ci.id.toString(), ciNames.get(ci)])));
                 onAddCiSeen(seen);
               }}
               items={ciReco.ciClose} ciNames={ciNames}/>

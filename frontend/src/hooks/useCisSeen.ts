@@ -11,9 +11,7 @@ export function useCisSeen() {
 
       if (cis.length > 0) {
         setCisSeen((current: CiCount) => {
-          console.log("CURRENT: " + JSON.stringify(current.entries));
           const newCounts = current.increment(cis);
-          console.log("NEW CISSEEN: " + JSON.stringify(newCounts.entries()));
           return newCounts;
         });
       };
