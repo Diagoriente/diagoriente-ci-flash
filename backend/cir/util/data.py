@@ -66,12 +66,14 @@ def get_preprocessing_info(dataset: DataSet[C, Any]) -> C:
     _, _, _, preproc_info = get_ci_data(dataset) #type: ignore because lru_cache confuses type checkers
     return preproc_info 
 
+
 def get_pca(dataset: DataSet[Any, Any]) -> Optional[stats.Pca]:
     pi = get_preprocessing_info(dataset)
     if isinstance(pi, stats.Pca):
         return pi
     else:
         return None
+
 
 @lru_cache(typed = True)
 def get_ci_data(dataset: DataSet[C, Any]) -> tuple[list[str], list[str], CiSet, C]:
@@ -95,11 +97,18 @@ def get_metiers_data(dataset: DataSet[Any, M]) -> tuple[Metiers, M]:
 
 
 class DataSetName(Enum):
+    _2022_03_24 = "2022-03-24"
     _2021_11_26b_6_AXES_ACP = "2021-11-26b 6 Axes ACP"
     _2022_01_21b_6_AXES_ACP = "2022-01-21b 6 Axes ACP"
 
 
 datasets: dict[DataSetName, DataSet] = {
+        DataSetName._2022_03_24: DataSet(
+            ci_path = Path("data/cotations/2022-03-24.csv"),
+            metiers_path = Path("data/métiers/2022-03-24.csv"),
+            ci_preprocessing = pca,
+            metiers_preprocessing = no_preprocessing,
+        ),
         DataSetName._2021_11_26b_6_AXES_ACP: DataSet(
             ci_path = Path("data/cotations/2021-11-26b_Cotations CI - Coefficients aggrégés - Sans Thématique-Identité.csv"),
             metiers_path = Path("data/métiers/Métiers CI correctifs du 23_11_21.csv"),
