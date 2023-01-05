@@ -104,7 +104,7 @@ $$
 \operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le j \le d}{
   d_j
   \over
-  \displaystyle\prod_{\substack{j', 1 \le j' \le d \\ j' \ne j \\ d_{j'} \ne \mathrm{NA}}} d_{j'}
+  \displaystyle\sum_{j' \in J'=\{j', 1 \le j' \le d, j' \ne j, d_{j'} \ne \mathrm{NA}\}} \frac{d_{j'}}{|J'|}
 }
 $$
 
