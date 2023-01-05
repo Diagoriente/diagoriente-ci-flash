@@ -4,7 +4,7 @@
 
 **Contexte:** Lors de son parcours sur Diagoriente, un utilisateur est amené à
 sélectionner ses centres d'intérêts (CI) parmis 154 disponibles pour lui
-présenter des métiers susceptibles de l'intéresser. Chaque CI est annoté sur 7
+présenter des métiers susceptibles de l'intéresser. Chaque CI est annoté sur 6
 axes avec une valeur entre -10 et 10, ou la valeur NA lorsque ce CI n'a pas de
 valeur associée à cet axe. Ces valeurs sont invisibles pour les
 utilisateurs mais sont utilisées pour faire des recommandations. Les axes sont:
@@ -15,7 +15,6 @@ utilisateurs mais sont utilisées pour faire des recommandations. Les axes sont:
 - Liberté créative—Cadre
 - Confort—Effort Physique
 - Conceptuel—Concrêt
-- Thématique/Environnement—Identité/Projet de vie
 
 **Objectif:** permettre aux utilisateurs de Diagoriente de trouver plus
 rapidement leurs centres d'intérêts qu'en énumérant les 154 disponibles.
@@ -52,8 +51,7 @@ par l'utilisateur, la méthode affine l'approximation de ses préférences, sugg
 de nouveaux CI et recommence.
 
 Les préférences d'un utilisateur sont représentées par un vecteur 
-$\vec\theta = (\theta_{1}, \dots, \theta_{d})$, ou $d$ est le nombre d'axes 
-(c'est-à-dire 7)
+$\vec\theta = (\theta_{1}, \dots, \theta_{d})$, ou $d$ est le nombre d'axes
 et $\theta_{i}$ la position préférée par l'utilisateur sur l'axe $i$.
 
 L'utilisateur est amené à sélectionner successivement des centres d'intérêts, on
@@ -116,3 +114,105 @@ autres petites.
 Les CI d'ouverture à l'instant $t$ sont donnés par la séquence des CI 
 $C^O_t = (c_i)_{1 \le i \le N}$ triés par 
 $\operatorname{ouv}(\vec c, \vec\theta_t)$ décroissant.
+
+
+## Algorithme
+
+L'objectif de l'algorithme est d'aider un utilisateur à choisir des centres
+d'intérêts (CI) en lui proposant 3 listes : des CI proches des siens, éloignés
+et d'ouverture. L'approche consiste à itérer autant de fois que nécessaire la
+procédure suivante :
+
+1. on propose à l'utilisateur un nombre prédéfini des CI proches, d'ouverture et
+   distants,
+2. il en sélectionne un que l'on ajoute à une liste des CI sélectionnés au cours
+   des itérations précédentes,
+3. on calcule les scores de proximité et d'ouverture de l'ensemble des CI en
+   fonction des CI sélectionnés,
+4. on constitue à partir de ces scores les nouvelles listes de CI proches,
+   distants et d'ouverture.
+
+À la première itérations, comme l'utilisateur n'a encore sélectionné aucun
+CI, nous n'avons aucune information sur ses préférences. On lui propose alors
+pour commencer des listes de CI aléatoires.
+
+Les calculs de scores de proximité et d'ouverture dépendent des valeurs données
+à chaque CI sur les axes listés au début du document. Chaque CI peut-être noté
+de -10 à 10 sur chaque axe. Quand un CI n'est pas noté sur un axe, on utilise la
+valeur `NaN`. Ces valeurs sont disponibles dans le fichier
+`data/cotations/2022-03-24.csv` (un CI par ligne et un axe par colonne).
+
+Le score de proximité d'un CI est grand si sa valeur sur chaque axe est proche
+de la moyenne des CI sélectionnés par l'utilisateur. On calcule d'abord la
+valeur moyenne par axe des CI sélectionnés en ignorant les `NaN`. Par exemple, à
+la `2`-ième itération (l'utilisateur a sélectionné `2` CI), si les valeurs
+associée à chacun des 6 axes pour les deux CI sont
+
+```
+ci_1 = [10, -10, NaN, 0, 0, NaN]
+ci_2 = [0, 0, 10, 0, 0, NaN]
+```
+
+la moyenne vaut `ci_moy = [5, -5, 10, 0, 0, NaN]`. Le score de proximité d'un
+autre CI `ci_3 = [5,5,5,5,5,5]` est calculé comme ça:
+
+```
+ci_moy = [5, -5, 10, 0, 0, NaN]
+ci_3 = [5,5,5,5,5,5]
+sum = 0
+non_nan_count = 0
+for i in 0 to 6:
+    if ci_3[i] != NaN and ci_moy[i] != NaN
+        sum = sum + abs(ci_3[i] - ci_moy[i])
+        non_nan_count = non_nan_count + 1
+result = sum / non_nan_count
+```
+
+Le score d'ouverture d'un CI est grand quand sa valeur sur 1 axe est loin de la
+valeur moyenne des CI sélectionnés pour cet axe et que les valeurs sur tous les
+autres axes sont proches. On le calcule comme ça:
+
+```
+ci_moy = [5, -5, 10, 0, 0, NaN]
+ci_3 = [5,5,5,5,5,5]
+ouv = 0
+for i in 0 to 6:
+    if ci_3[i] != NaN and ci_moy[i] != NaN:
+        dist_i = abs(ci_3[i] - ci_moy[i])
+        sum_dist = 0
+        not_nan_count = 0
+        for j in 0 to 6:
+            if j != i and ci_3[j] != NaN and ci_moy[j] != NaN:
+                dist_j = abs(ci_3[j] - ci_moy[j])
+                sum_dist = sum_dist + dist_j
+                not_nan_count += 1
+        mean_dist = sum_dist / not_nan_count
+        ouv_i = dist_i / mean_dist
+        if ouv_i > ouv:
+            ouv = ouv_i
+result = ouv
+```
+
+Les scores de proximité et d'ouverture servent ensuite à constituer les listes
+de CI proches, distants et d'ouverture. On construit des listes de taille $L$
+comme suit:
+
+- la liste de CI proches contient les $L$ CI avec les plus grands scores de
+  proximité qui n'ont pas déjà été sélectionnés par l'utilisateur ni déjà
+  proposées 3 fois ou plus.
+- la liste de CI d'ouverture contient les $L$ CI avec les plus grands scores
+  d'ouverture qui n'ont pas déjà été sélectionnés par l'utilisateur ni déjà
+  proposés 3 fois ou plus et qui n'apparaissent pas dans la liste précédente.
+- la liste de CI distants contient les $L$ CI avec les plus petits scores de
+  proximité qui n'ont pas déjà été sélectionnés par l'utilisateur ni déjà
+  proposés 3 fois ou plus et qui n'apparaissent dans aucune des deux listes
+  précédentes.
+
+Ces listes sont reproposées à l'utilisateur pour une nouvelle sélection, et on
+boucle.
+
+Au fur et à mesure des itérations, lorsque l'utilisateur a sélectionné ou vu
+un beaucoup de CI au moins 3 fois, il se peut qu'il ne reste plus suffisamment
+de CI pour constituer des listes de taille $L$.
+
+
