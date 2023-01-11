@@ -39,6 +39,16 @@ rapidement leurs centres d'intérêts qu'en énumérant les 154 disponibles.
 - La moyenne des coefficients des centres d'intérêts sélectionnés à un instant
   donné est une approximation des préférences de l'utilisateur.
 
+## Données d'entrées
+
+Les données d'entrées sont les valeurs de chaque CI sur chaque axe. Différentes
+versions du jeu de données sont disponibles dans le répertoire `data/cotations`.
+Le jeu de données actuel à utiliser est `data/cotations/2022-03-24_ACP.csv`. Il
+a été créé en transformant par analyse en composante principale (ACP) le jeu
+`data/cotations/2022-03-24.csv`. Ce dernier a été créé par une annotation
+manuelle des CI sur chaque axe.
+
+
 ## Formalisation de la méthode
 
 Les listes de CI proches, d'ouverture et éloignés présentées à l'utilisateurs
