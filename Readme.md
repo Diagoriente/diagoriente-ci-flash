@@ -142,8 +142,8 @@ de -10 à 10 sur chaque axe. Quand un CI n'est pas noté sur un axe, on utilise 
 valeur `NaN`. Ces valeurs sont disponibles dans le fichier
 `data/cotations/2022-03-24.csv` (un CI par ligne et un axe par colonne).
 
-Le score de proximité d'un CI est grand si sa valeur sur chaque axe est proche
-de la moyenne des CI sélectionnés par l'utilisateur. On calcule d'abord la
+Le score de proximité d'un CI reflète sa distance sur chaque axe avec
+la moyenne des CI sélectionnés par l'utilisateur. On calcule d'abord la
 valeur moyenne par axe des CI sélectionnés en ignorant les `NaN`. Par exemple, à
 la `2`-ième itération (l'utilisateur a sélectionné `2` CI), si les valeurs
 associée à chacun des 6 axes pour les deux CI sont
@@ -197,7 +197,7 @@ Les scores de proximité et d'ouverture servent ensuite à constituer les listes
 de CI proches, distants et d'ouverture. On construit des listes de taille $L$
 comme suit:
 
-- la liste de CI proches contient les $L$ CI avec les plus grands scores de
+- la liste de CI proches contient les $L$ CI avec les plus petits scores de
   proximité qui n'ont pas déjà été sélectionnés par l'utilisateur ni déjà
   proposées 3 fois ou plus.
 - la liste de CI d'ouverture contient les $L$ CI avec les plus grands scores
