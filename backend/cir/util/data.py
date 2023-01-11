@@ -97,12 +97,19 @@ def get_metiers_data(dataset: DataSet[Any, M]) -> tuple[Metiers, M]:
 
 
 class DataSetName(Enum):
+    _2022_03_24_ACP = "2022-03-24_ACP"
     _2022_03_24 = "2022-03-24"
     _2021_11_26b_6_AXES_ACP = "2021-11-26b 6 Axes ACP"
     _2022_01_21b_6_AXES_ACP = "2022-01-21b 6 Axes ACP"
 
 
 datasets: dict[DataSetName, DataSet] = {
+        DataSetName._2022_03_24_ACP: DataSet(
+            ci_path = Path("data/cotations/2022-03-24_ACP.csv"),
+            metiers_path = Path("data/métiers/2022-03-24.csv"),
+            ci_preprocessing = no_preprocessing,
+            metiers_preprocessing = no_preprocessing,
+        ),
         DataSetName._2022_03_24: DataSet(
             ci_path = Path("data/cotations/2022-03-24.csv"),
             metiers_path = Path("data/métiers/2022-03-24.csv"),
