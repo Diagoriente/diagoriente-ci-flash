@@ -128,6 +128,8 @@ $\operatorname{ouv}(\vec c, \vec\theta_t)$ décroissant.
 
 ## Algorithme
 
+### Recommandation de centres d'intérêts
+
 L'objectif de l'algorithme est d'aider un utilisateur à choisir des centres
 d'intérêts (CI) en lui proposant 3 listes : des CI proches des siens, éloignés
 et d'ouverture. L'approche consiste à itérer autant de fois que nécessaire la
@@ -226,3 +228,39 @@ un beaucoup de CI au moins 3 fois, il se peut qu'il ne reste plus suffisamment
 de CI pour constituer des listes de taille $L$.
 
 
+### Recommandation de métiers
+
+On peut recommander à un utilisateur une liste de métiers qui correspondent aux
+centres d'intérêts qu'il a sélectionnés.
+
+Le fichier `data/métiers/2022-03-24.csv` fait la correspondance entre les
+métiers (lignes) et les centres d'intérêts (colonnes). Pour chaque métier et
+chaque centre d'intérêt, un coefficient entre 0 et 1 donne le degré
+d'association entre les deux. 
+
+Les métiers recommandés en premier sont ceux qui sont le plus associés aux
+centres d'intérêt de l'utilisateur. Pour chaque métier on calcule un score qui
+correspond à la somme des coefficients entre lui et les centre d'intérêt
+sélectionné par l'utilisateur. C'est-à-dire :
+
+```
+# Exemple de centre d'intérêts (identifiants) sélectionnés par l'utilisateurs
+cis = [57, 23, 42]
+
+# List des métiers (identifiants)
+metiers = [1, 2, 3, ...]
+
+# Coefficients d'association. coef[m, c] donne la valeur du coefficient
+# d'association entre le métier m et le centre d'intérêt c.
+coef = ...
+
+score = 0
+for c in cis:
+  for m in metiers:
+    score = score + coef[m, c]
+
+result = score
+```
+
+Les métiers triés par score décroissants forment la liste de recommandations.
+Les métiers les plus recommandés apparaissent en premier.
