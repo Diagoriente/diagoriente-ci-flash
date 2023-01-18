@@ -114,7 +114,7 @@ $$
 \operatorname{ouv}(\vec c, \vec\theta_t) = \max_{1 \le j \le d}{
   d_j
   \over
-  \displaystyle\sum_{j' \in J'=\{j', 1 \le j' \le d, j' \ne j, d_{j'} \ne \mathrm{NA}\}} \frac{d_{j'}}{|J'|}
+  1 + \displaystyle\sum_{j' \in J'=\{j', 1 \le j' \le d, j' \ne j, d_{j'} \ne \mathrm{NA}\}} \frac{d_{j'}}{|J'|}
 }
 $$
 
@@ -199,7 +199,7 @@ for i in 0 to 6:
                 sum_dist = sum_dist + dist_j
                 not_nan_count += 1
         mean_dist = sum_dist / not_nan_count
-        ouv_i = dist_i / mean_dist
+        ouv_i = dist_i / (1 + mean_dist)
         if ouv_i > ouv:
             ouv = ouv_i
 result = ouv
